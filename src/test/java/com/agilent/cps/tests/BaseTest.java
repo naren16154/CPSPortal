@@ -20,7 +20,7 @@ public class BaseTest implements ITest{
 	@BeforeSuite
 	public void configurationSetup() {
 		String browser = System.getProperty("browser");
-		String isRCServer = System.getProperty("isRCServer");
+		String isRCServer = System.getProperty("isrcserver");
 		String port = System.getProperty("port");
 		
 		if(!("".equals(browser) || null == browser))
