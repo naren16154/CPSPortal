@@ -3,6 +3,7 @@ package com.agilent.cps.core;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,8 +28,13 @@ public class DriverManagerHelper {
 	public WebElement getWebElement(WidgetInfo widgetInfo)
 	{
 		By byLocator = getByLocator(widgetInfo);
-		WebElement element = getWebDriver().findElement(byLocator);
-		return element;
+		return getWebDriver().findElement(byLocator);
+	}
+	
+	public List<WebElement> getWebElements(WidgetInfo widgetInfo)
+	{
+		By byLocator = getByLocator(widgetInfo);
+		return getWebDriver().findElements(byLocator);
 	}
 	
 	public WebDriver getWebDriver()
@@ -154,12 +160,22 @@ public class DriverManagerHelper {
 		return widgetInfoMap;
 	}
 
-	public void sleep(double sec) {
+	public static void sleep(double sec) {
 		try {
 			Thread.sleep((long) (sec*1000));
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	/*
+	 * Quit WebDriver
+	 */
+	public void tearDown() {
+		WebDriver driver = adfManager.getCurrentWebDriver();               
+		if (null != driver)
+			driver.quit();
+		sleep(2);
 	}
 
 }

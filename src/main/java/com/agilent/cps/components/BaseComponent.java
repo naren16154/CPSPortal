@@ -4,13 +4,17 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 import com.agilent.cps.core.AutoPopulator;
+import com.agilent.cps.core.DriverManager;
 
-public class BaseComponent {
+public abstract class BaseComponent {
 
+	DriverManager DM = DriverManager.getInstance();
+	
+	
 	public void populate(Map<String, String> rowData) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-		System.out.println("################################ ROWDATA ############################");
-		System.out.println(rowData);
-//		AutoPopulator.populate(this, rowData);
+		AutoPopulator.populate(this, rowData);
 	}
+	
+	public abstract String getComponentName();
 
 }

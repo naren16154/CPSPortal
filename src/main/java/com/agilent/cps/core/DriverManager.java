@@ -68,7 +68,7 @@ public class DriverManager {
 			} catch (InterruptedException e) {
 			}
 		}while(sw.elapsed().toMillis()<(timeOutInSeconds*1000));
-		adfManagerHelper.sleep(.5);
+		DriverManagerHelper.sleep(.5);
 		sw.stop();
 	}
 	
@@ -84,7 +84,7 @@ public class DriverManager {
 			} catch (InterruptedException e) {
 			}
 		}while(sw.elapsed().toMillis()<(timeOutInSeconds*1000));
-		adfManagerHelper.sleep(.5);
+		DriverManagerHelper.sleep(.5);
 		sw.stop();
 	}
 	
@@ -101,7 +101,7 @@ public class DriverManager {
 			} catch (InterruptedException e) {
 			}
 		}while(sw.elapsed().toMillis()<(timeOutInSeconds*1000));
-		adfManagerHelper.sleep(.5);
+		DriverManagerHelper.sleep(.5);
 		sw.stop();
 		return false;
 	}
@@ -119,7 +119,7 @@ public class DriverManager {
 			} catch (InterruptedException e) {
 			}
 		}while(sw.elapsed().toMillis()<(timeOutInSeconds*1000));
-		adfManagerHelper.sleep(.5);
+		DriverManagerHelper.sleep(.5);
 		sw.stop();
 		return false;
 	}
@@ -130,7 +130,7 @@ public class DriverManager {
 		WebDriverWait wait = new WebDriverWait(driver, timeOutInSeconds, (long) (interval*1000));
 		try{
 			wait.until(ExpectedConditions.presenceOfElementLocated(locator));
-			adfManagerHelper.sleep(.5);
+			DriverManagerHelper.sleep(.5);
 			return true;
 		}catch(Exception e)
 		{
@@ -144,7 +144,7 @@ public class DriverManager {
 		WebDriverWait wait = new WebDriverWait(driver, timeOutInSeconds, (long) (interval*1000));
 		try{
 			wait.until(ExpectedConditions.elementToBeClickable(locator));
-			adfManagerHelper.sleep(.5);
+			DriverManagerHelper.sleep(.5);
 			return true;
 		}catch(Exception e)
 		{
@@ -158,12 +158,12 @@ public class DriverManager {
 		String style = null;
 		do
 		{
-			adfManagerHelper.sleep(.5);
+			DriverManagerHelper.sleep(.5);
 			WebElement element = driver.findElement(By.xpath("html/body"));
 			style = element.getAttribute("style");
 			if(null != style && (!"cursor: wait;".equals(style)))
 			{
-				adfManagerHelper.sleep(1);
+				DriverManagerHelper.sleep(1);
 				return;
 			}
 		}while(sw.elapsed().toMillis()<(30*1000));
@@ -175,7 +175,7 @@ public class DriverManager {
 		By locator = By.xpath("//*[@id='pt1:_UIScil1u' or @id='_FOpt1:_UIScil1u']");
 		WebDriverWait wait = new WebDriverWait(driver, 60, 2000);
 		try{
-			adfManagerHelper.sleep(2);
+			DriverManagerHelper.sleep(2);
 			wait.until(ExpectedConditions.elementToBeClickable(locator));
 			waitForAjaxToLoad();
 			return;

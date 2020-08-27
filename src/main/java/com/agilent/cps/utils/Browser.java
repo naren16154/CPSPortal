@@ -14,10 +14,11 @@ import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+import com.agilent.cps.core.DriverManager;
+
 public class Browser{
 	
-	public static DriverManager driverManager = DriverManager.getInstance();
-	public static com.agilent.cps.core.DriverManager DM = com.agilent.cps.core.DriverManager.getInstance();
+	public static DriverManager DM = DriverManager.getInstance();
 	
 	/*
 	 * To Initiate and Load URL into Browser
@@ -26,7 +27,7 @@ public class Browser{
 	{
 		WebDriver driver = initializeBrowser();
 		System.out.println("Browser launched Successfully");
-		driverManager.setActiveDriver(driver);
+		DM.setActiveDriver(driver);
 		DM.setActiveDriver(driver);
 		driver.manage().timeouts().pageLoadTimeout(Integer.parseInt(Constants.pageLoadTimeout), TimeUnit.SECONDS);
 		driver.manage().timeouts().implicitlyWait(Integer.parseInt(Constants.implicitWait), TimeUnit.SECONDS);
@@ -41,7 +42,7 @@ public class Browser{
 	 */
 	public void loadUrl(String loadUrl)
 	{
-		driverManager.getActiveDriver().navigate().to(loadUrl);
+		DM.getCurrentWebDriver().navigate().to(loadUrl);
 	}
 	
 	/*

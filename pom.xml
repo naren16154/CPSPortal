@@ -32,7 +32,7 @@
 			<artifactId>selenium-server</artifactId>
 			<version>3.141.59</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
@@ -50,38 +50,38 @@
 			<artifactId>poi-ooxml-schemas</artifactId>
 			<version>3.11-beta2</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.reflections</groupId>
 			<artifactId>reflections</artifactId>
 			<version>0.9.10</version>
 		</dependency>
-		
+
 		<dependency>
-		    <groupId>com.cognifide.qa.bb</groupId>
-		    <artifactId>bb-aem-64</artifactId>
-		    <version>2.3.0</version>
+			<groupId>com.cognifide.qa.bb</groupId>
+			<artifactId>bb-aem-64</artifactId>
+			<version>2.3.0</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>com.cognifide.qa.bb</groupId>
 			<artifactId>bobcat</artifactId>
 			<version>1.2.1</version>
 			<type>pom</type>
 		</dependency>
-		
+
 		<dependency>
-    <groupId>com.cognifide.qa.bb</groupId>
-    <artifactId>bb-junit5</artifactId>
-    <version>2.0.1</version>
-</dependency>
-			
+			<groupId>com.cognifide.qa.bb</groupId>
+			<artifactId>bb-junit5</artifactId>
+			<version>2.0.1</version>
+		</dependency>
+
 		<dependency>
-		    <groupId>com.cognifide.qa.bb</groupId>
-		    <artifactId>bb-aem-core</artifactId>
-		    <version>2.3.0</version>
-		</dependency>		
-		
+			<groupId>com.cognifide.qa.bb</groupId>
+			<artifactId>bb-aem-core</artifactId>
+			<version>2.3.0</version>
+		</dependency>
+
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>

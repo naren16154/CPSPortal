@@ -8,9 +8,9 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 
+import com.agilent.cps.core.DriverManagerHelper;
 import com.agilent.cps.utils.Browser;
 import com.agilent.cps.utils.Constants;
-import com.agilent.cps.utils.DriverManager;
 
 public class BaseTest implements ITest{
 	
@@ -36,12 +36,12 @@ public class BaseTest implements ITest{
 	@BeforeMethod(alwaysRun = true)
 	public void launchBrowser(Method method) {
 		testname=method.getName();
-		browser.startBrowser("https://www.agilent.com/");
+		browser.startBrowser("http://stgwww.pathology-education.agilent.com/us/en/home.html");
 	}
 	
 	@AfterMethod(alwaysRun = true)
 	public void teardown() {
-		DriverManager.getInstance().tearDown();
+		DriverManagerHelper.getInstance().tearDown();
 	}
 
 	@Override

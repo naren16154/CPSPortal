@@ -94,22 +94,29 @@
 				<div style="background-color: inactiveborder;">
 					Filter Here
 					<br />
-					<input type="checkbox" id="INFO" onchange="filter(); return false;" />
+					<input type="checkbox" id="INFO"
+						onchange="filter(); return false;" />
 					Info
 					<input type="checkbox" name="debug" id="DEBUG"
 						onchange="debugFilter(); return false;" />
 					Debug
-					<input type="checkbox" id="VERIFICATION_POINT" onchange="filter(); return false;" />
+					<input type="checkbox" id="VERIFICATION_POINT"
+						onchange="filter(); return false;" />
 					Verification points
-					<input type="checkbox" id="ACTION" onchange="filter(); return false;" />
+					<input type="checkbox" id="ACTION"
+						onchange="filter(); return false;" />
 					Actions
-					<input type="checkbox" id="METHOD" onchange="filter(); return false;" />
+					<input type="checkbox" id="METHOD"
+						onchange="filter(); return false;" />
 					Methods
-					<input type="checkbox" id="ERROR" onchange="filter(); return false;" />
+					<input type="checkbox" id="ERROR"
+						onchange="filter(); return false;" />
 					Errors
-					<input type="checkbox" id="FATAL" onchange="filter(); return false;" />
+					<input type="checkbox" id="FATAL"
+						onchange="filter(); return false;" />
 					Fatal
-					<input type="checkbox" id="WARNINGS" onchange="filter(); return false;" />
+					<input type="checkbox" id="WARNINGS"
+						onchange="filter(); return false;" />
 					Warnings
 					<button id="default" onclick="noFilter(); return false;">Default</button>
 				</div>
@@ -124,11 +131,11 @@
 							style="font-family: inherit; font-size: small">
 							<xsl:variable name="color">
 								<xsl:choose>
-									<xsl:when test="@level='INFO' or @level='DEBUG' or @level='ACTION' or @level='STATUS'">
+									<xsl:when
+										test="@level='INFO' or @level='DEBUG' or @level='ACTION' or @level='STATUS'">
 										black
 									</xsl:when>
-									<xsl:when
-										test="@level='METHOD'">
+									<xsl:when test="@level='METHOD'">
 										brown
 									</xsl:when>
 									<xsl:when

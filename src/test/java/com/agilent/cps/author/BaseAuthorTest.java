@@ -19,6 +19,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.openqa.selenium.By;
 import org.reflections.Reflections;
 import org.testng.ITest;
 import org.testng.annotations.AfterClass;
@@ -29,10 +30,15 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 
 import com.agilent.cps.components.BaseComponent;
-import com.agilent.cps.utils.Logger;
+import com.agilent.cps.core.DriverManager;
+import com.agilent.cps.core.DriverManagerHelper;
 import com.agilent.cps.utils.Browser;
 import com.agilent.cps.utils.Constants;
-import com.agilent.cps.utils.DriverManager;
+import com.agilent.cps.utils.Logger;
+import com.agilent.cps.widgetactions.Button;
+import com.agilent.cps.widgetactions.GUIWidget;
+import com.agilent.cps.widgetactions.TextField;
+import com.agilent.cps.widgets.WidgetInfo;
 
 public class BaseAuthorTest implements ITest{
 	
@@ -78,15 +84,50 @@ public class BaseAuthorTest implements ITest{
 		}
 	}
 	
+	@BeforeClass(alwaysRun = true)
+	public void launchBrowser() {
+		DriverManager DM = DriverManager.getInstance();
+		browser.startBrowser("http://localhost:4502/");
+		
+		DM.textField(new WidgetInfo("id=username", TextField.class)).setDisplayValue("admin");
+		DM.textField(new WidgetInfo("id=password", TextField.class)).setDisplayValue("admin");
+		DM.button(new WidgetInfo("id=submit-button", Button.class)).click();
+		DM.GUIWidget(new WidgetInfo("xpath=//div[text()='Sites']", GUIWidget.class)).click();
+		
+		String[] path = {"pathology-education","Language Masters","English","Testing"};
+		
+		for(int i=0; i<path.length; i++) {
+			if(i != path.length-1) {
+				DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='"+path[i]+"']")).click();
+			}else {
+				DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='"+path[i]+"']/../..//img")).click();
+			}
+		}
+		
+		DM.getCurrentWebDriver().findElement(By.xpath("//button/coral-button-label[contains(text(), 'Edit')]")).click();
+		
+		for(int i=0; i<=6; i++) {
+			DriverManagerHelper.sleep(5);
+			if(DM.getCurrentWebDriver().getWindowHandles().size()==2)
+				break;
+		}
+		for(String window : DM.getCurrentWebDriver().getWindowHandles())
+			DM.getCurrentWebDriver().switchTo().window(window);
+	}
+	
 	@BeforeMethod(alwaysRun = true)
-	public void launchBrowser(Object[] args) {
+	public void beforeMethod(Object[] args) {
 		testname=(String) args[1];
-//		browser.startBrowser("https://www.agilent.com/");
 	}
 	
 	@AfterMethod(alwaysRun = true)
+	public void afterMethod() {
+		
+	}
+	
+	@AfterClass(alwaysRun = true)
 	public void teardown() {
-		DriverManager.getInstance().tearDown();
+		DriverManagerHelper.getInstance().tearDown();
 	}
 
 	@Override
