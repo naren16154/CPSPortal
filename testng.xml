@@ -9,7 +9,7 @@
 		<groups>
 			<run>
 				<include name="author"></include>
-				<include name="test"></include>
+				<!-- <include name="test"></include> -->
 			</run>
 		</groups>
 		<classes>
