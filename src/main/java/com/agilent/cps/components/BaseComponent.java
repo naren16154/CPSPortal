@@ -32,8 +32,6 @@ public abstract class BaseComponent {
 		
 		List<Object> actualStyles = Arrays.asList(styles.split(","));
 		
-		WebElement stylesBlock = DM.getCurrentWebDriver().findElements(By.id("editor-styleselector-form")).get(1);
-		
 		List<WebElement> stylesList = DM.getCurrentWebDriver().findElements(By.xpath("//form[@id='editor-styleselector-form']//coral-selectlist-item[@class='coral3-SelectList-item']"));
 		
 		for(WebElement style : stylesList) {
