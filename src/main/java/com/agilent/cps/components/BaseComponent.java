@@ -31,7 +31,8 @@ public abstract class BaseComponent {
 		DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Done']")).click();
 		DriverManagerHelper.sleep(2);
 		
-		DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='"+this.getComponentName()+"']")).click();
+		List<WebElement> components = DM.getCurrentWebDriver().findElements(By.xpath("//div[@title='"+this.getComponentName()+"']"));
+		components.get(components.size()-1).click();
 		DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Styles']")).click();
 		
 		List<Object> actualStyles = Arrays.asList(styles.split(","));
@@ -47,8 +48,8 @@ public abstract class BaseComponent {
 		
 		DM.getCurrentWebDriver().findElements(By.xpath("//button[@icon='check']")).get(1).click();
 		DriverManagerHelper.sleep(2);
-		DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='"+this.getComponentName()+"']")).click();
-		DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Configure']")).click();
+//		DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='"+this.getComponentName()+"']")).click();
+//		DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Configure']")).click();
 	}
 	
 

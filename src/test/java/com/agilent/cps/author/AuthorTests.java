@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -14,6 +16,7 @@ import com.agilent.cps.core.DriverManagerHelper;
 import com.agilent.cps.core.Verify;
 import com.agilent.cps.utils.ReadExcel;
 import com.agilent.cps.utils.ScreenShotUtility;
+import com.agilent.cps.widgetactions.Button;
 import com.agilent.cps.widgetactions.TextField;
 import com.agilent.cps.widgets.WidgetInfo;
 
@@ -42,13 +45,29 @@ public class AuthorTests extends BaseAuthorTest{
 			DriverManagerHelper.sleep(2);
 			DM.getCurrentWebDriver().findElement(By.xpath("//coral-selectlist-item[text()='"+componentName+"']")).click();
 			DriverManagerHelper.sleep(2);
-			DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='"+componentName+"']")).click();
+			WebElement componentElement = DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='"+componentName+"']"));
+			if(componentName.equalsIgnoreCase("Carousel")) {
+				componentElement.click();
+				DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Parent']/coral-icon")).click();
+				DM.getCurrentWebDriver().findElement(By.xpath("//coral-list-item-content[text()='Carousel']")).click();
+				/*
+				 * Actions actions = new Actions(DM.getCurrentWebDriver()); int height =
+				 * componentElement.getSize().height;
+				 * System.out.println("Y : "+componentElement.getLocation().y);
+				 * System.out.println("Offset : "+(height/2-10));
+				 * actions.moveToElement(componentElement, 0,
+				 * -(height/2-10)).click().build().perform();
+				 */
+			}else
+				componentElement.click();
 			DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Configure']")).click();
 			DriverManagerHelper.sleep(2);
 			componentObject.populate(rowData);
 			DriverManagerHelper.sleep(2);
-			DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Done']")).click();
-			DriverManagerHelper.sleep(2);
+			if(DM.widgetEnabled(new WidgetInfo("xpath=//button[@title='Done']", Button.class), 1, .5)) {
+				DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Done']")).click();
+				DriverManagerHelper.sleep(2);
+			}
 //			DM.getCurrentWebDriver().findElement(By.xpath("//button/coral-button-label[text()='Preview']")).click();
 //			DriverManagerHelper.sleep(2);
 //			DriverManagerHelper.getInstance().switchFrame(new WidgetInfo("id=ContentFrame", GUIWidget.class));
@@ -73,7 +92,13 @@ public class AuthorTests extends BaseAuthorTest{
 			DriverManagerHelper.getInstance().switchWindow(authoringWindow);
 			
 			DriverManagerHelper.sleep(2);
-			DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='"+componentName+"']")).click();
+			componentElement = DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='"+componentName+"']"));
+			if(componentName.equalsIgnoreCase("Carousel")) {
+				componentElement.click();
+				DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Parent']/coral-icon")).click();
+				DM.getCurrentWebDriver().findElement(By.xpath("//coral-list-item-content[text()='Carousel']")).click();
+			}else
+				componentElement.click();
 			DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Delete']")).click();
 			
 			DM.getCurrentWebDriver().findElement(By.xpath("//button/coral-button-label[text()='Delete']")).click();

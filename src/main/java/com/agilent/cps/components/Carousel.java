@@ -28,9 +28,10 @@ public class Carousel extends BaseComponent{
 		String[] carouselTabs = heroComponents.split("\n");
 		for(int i=0; i<carouselTabs.length; i++) {
 			DM.button(Widgets.addButton).click();
-			DM.textField(new WidgetInfo("//coral-search//input", TextField.class)).setDisplayValue("herocomponent");
-			DM.GUIWidget(new WidgetInfo("xpath=//coral-selectlist-item[text()='herocomponent']", GUIWidget.class)).click();
 			DriverManagerHelper.sleep(2);
+			DM.textField(new WidgetInfo("xpath=//coral-search//input", TextField.class)).setDisplayValue("herocomponent");
+			DriverManagerHelper.sleep(2);
+			DM.GUIWidget(new WidgetInfo("xpath=//coral-selectlist-item[text()='herocomponent']", GUIWidget.class)).click();
 		}
 		List<WebElement> inputs = DM.getCurrentWebDriver().findElements(By.xpath("//input[contains(@name,'cq:panelTitle')]"));
 		for(int i=0; i<inputs.size(); i++)
@@ -45,14 +46,21 @@ public class Carousel extends BaseComponent{
 	public void authorHerocomponents(String heroData) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		DriverManagerHelper.sleep(2);
 		DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Done']")).click();
-		for(Map<String, String> rowData : getDataMap(heroData)) {
-			DM.getCurrentWebDriver().findElement(By.xpath("//div[@title=herocomponent']")).click();
+		List<Map<String, String>> dataIterations = getDataMap(heroData);
+		List<WebElement> heroComponents = DM.getCurrentWebDriver().findElements(By.xpath("//div[@title='herocomponent']"));
+		for(int i=0; i<heroComponents.size(); i++) {
+			heroComponents.get(0).click();
 			DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Configure']")).click();
 			DriverManagerHelper.sleep(2);
+			Map<String, String> rowData = dataIterations.get(i);
+			rowData.remove("TestName");
 			(new Hero()).populate(rowData);
 			DriverManagerHelper.sleep(2);
-			DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Done']")).click();
-			DriverManagerHelper.sleep(2);
+			if(DM.widgetEnabled(new WidgetInfo("xpath=//button[@title='Done']", Button.class), 1, .5)) {
+				DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Done']")).click();
+				DriverManagerHelper.sleep(2);
+			}
+			heroComponents = DM.getCurrentWebDriver().findElements(By.xpath("//div[@title='herocomponent']"));
 		}
 	}
 	
