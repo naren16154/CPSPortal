@@ -45,8 +45,6 @@ public class DriverManagerHelper {
 	public void switchWindow(String winTitle)
 	{
 		WebDriver driver = getWebDriver();
-		if(winTitle.equalsIgnoreCase(driver.getTitle()))
-			return;
 		for(String winHandle : driver.getWindowHandles())
 		{
 			driver.switchTo().window(winHandle);

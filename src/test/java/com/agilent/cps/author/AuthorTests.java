@@ -11,10 +11,9 @@ import org.testng.annotations.Test;
 import com.agilent.cps.components.BaseComponent;
 import com.agilent.cps.core.DriverManager;
 import com.agilent.cps.core.DriverManagerHelper;
+import com.agilent.cps.core.Verify;
 import com.agilent.cps.utils.ReadExcel;
 import com.agilent.cps.utils.ScreenShotUtility;
-import com.agilent.cps.widgetactions.Button;
-import com.agilent.cps.widgetactions.GUIWidget;
 import com.agilent.cps.widgetactions.TextField;
 import com.agilent.cps.widgets.WidgetInfo;
 
@@ -45,70 +44,44 @@ public class AuthorTests extends BaseAuthorTest{
 			DriverManagerHelper.sleep(2);
 			DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='"+componentName+"']")).click();
 			DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Configure']")).click();
+			DriverManagerHelper.sleep(2);
 			componentObject.populate(rowData);
+			DriverManagerHelper.sleep(2);
 			DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Done']")).click();
+			DriverManagerHelper.sleep(2);
+//			DM.getCurrentWebDriver().findElement(By.xpath("//button/coral-button-label[text()='Preview']")).click();
+//			DriverManagerHelper.sleep(2);
+//			DriverManagerHelper.getInstance().switchFrame(new WidgetInfo("id=ContentFrame", GUIWidget.class));
+//			componentObject.verifyPreview(rowData);
+//			ScreenShotUtility.getInstance().takeScreenshot();
+//			DM.getCurrentWebDriver().switchTo().defaultContent();
+//			DM.getCurrentWebDriver().findElement(By.xpath("//button[text()='Edit']")).click();
 			
-			DM.getCurrentWebDriver().findElement(By.xpath("//button/coral-button-label[text()='Preview']")).click();;
+			String authoringWindow = DM.getCurrentWebDriver().getTitle();
+			DM.getCurrentWebDriver().findElement(By.id("pageinfo-trigger")).click();
+			DriverManagerHelper.sleep(2);
+			DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='View as Published']")).click();
+			
+			for(String window : DM.getCurrentWebDriver().getWindowHandles())
+				DM.getCurrentWebDriver().switchTo().window(window);
+			
+			componentObject.verifyPreview(rowData);
 			ScreenShotUtility.getInstance().takeScreenshot();
-			DM.getCurrentWebDriver().findElement(By.xpath("//button[text()='Edit']")).click();
+			
+			DM.getCurrentWebDriver().close();
+			
+			DriverManagerHelper.getInstance().switchWindow(authoringWindow);
 			
 			DriverManagerHelper.sleep(2);
 			DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='"+componentName+"']")).click();
 			DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Delete']")).click();
 			
 			DM.getCurrentWebDriver().findElement(By.xpath("//button/coral-button-label[text()='Delete']")).click();
+			Verify.softAssert.assertAll();
+			DriverManagerHelper.sleep(2);
 		}
 		else
 			throw new Exception("Unable to find screen object");
-	}
-	
-	@Test(groups= {"author1"})
-	public void sampleAuthorTest() throws InterruptedException {
-		DriverManager DM = DriverManager.getInstance();
-		browser.startBrowser("http://localhost:4502/");
-		
-		DM.textField(new WidgetInfo("id=username", TextField.class)).setDisplayValue("admin");
-		DM.textField(new WidgetInfo("id=password", TextField.class)).setDisplayValue("admin");
-		DM.button(new WidgetInfo("id=submit-button", Button.class)).click();
-		DM.GUIWidget(new WidgetInfo("xpath=//div[text()='Sites']", GUIWidget.class)).click();
-		
-		String[] path = {"pathology-education","Language Masters","English","Testing"};
-		
-		for(int i=0; i<path.length; i++) {
-			if(i != path.length-1) {
-				DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='"+path[i]+"']")).click();
-			}else {
-				DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='"+path[i]+"']/../..//img")).click();
-			}
-		}
-		
-		DM.getCurrentWebDriver().findElement(By.xpath("//button/coral-button-label[contains(text(), 'Edit')]")).click();
-		
-		for(int i=0; i<=6; i++) {
-			Thread.sleep(5000);
-			if(DM.getCurrentWebDriver().getWindowHandles().size()==2)
-				break;
-		}
-		for(String window : DM.getCurrentWebDriver().getWindowHandles())
-			DM.getCurrentWebDriver().switchTo().window(window);
-		
-		DM.getCurrentWebDriver().findElement(By.xpath("//div[@data-text='Drag components here']")).click();
-		DM.getCurrentWebDriver().findElements(By.xpath("//button[@icon='add']/coral-icon")).get(1).click();
-		
-		DM.textField(new WidgetInfo("xpath=//coral-search//input", TextField.class)).setDisplayValue("Headline");
-		Thread.sleep(2000);
-		DM.getCurrentWebDriver().findElement(By.xpath("//coral-selectlist-item[text()='Headline']")).click();
-		
-		DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='Headline']")).click();
-		DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Configure']")).click();
-		
-		DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Done']")).click();
-		
-		DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='Headline']")).click();
-		DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Delete']")).click();
-		
-		DM.getCurrentWebDriver().findElement(By.xpath("//button/coral-button-label[text()='Delete']")).click();
-		
 	}
 	
 	@DataProvider(name="getAuthorTestNames")
@@ -143,20 +116,6 @@ public class AuthorTests extends BaseAuthorTest{
 		}
 		
 		return array;
-	}
-	
-	public List<Map<String, String>> getDataMap(String iterations)
-	{
-		if(iterations.contains("("))
-		{
-			String num = iterations.replaceAll(".*\\(|\\).*", "").trim();
-			String sheet = iterations.substring(0, iterations.lastIndexOf("("));
-			int start = Integer.parseInt(num.split(",")[0].trim())-1;
-			int end = Integer.parseInt(num.split(",")[1].trim());
-			return dataMap.get(sheet).subList(start, end);
-		}
-		else
-			return dataMap.get(iterations);			
 	}
 	
 }

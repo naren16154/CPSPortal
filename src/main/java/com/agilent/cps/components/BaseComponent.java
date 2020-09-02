@@ -11,15 +11,19 @@ import org.openqa.selenium.WebElement;
 import com.agilent.cps.core.AutoPopulator;
 import com.agilent.cps.core.DriverManager;
 import com.agilent.cps.core.DriverManagerHelper;
+import com.agilent.cps.utils.ReadExcel;
 
 public abstract class BaseComponent {
 
 	DriverManager DM = DriverManager.getInstance();
+	DriverManagerHelper DMHelper = DriverManagerHelper.getInstance();
 	
 	
 	public void populate(Map<String, String> rowData) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		AutoPopulator.populate(this, rowData);
 	}
+	
+	public abstract void verifyPreview(Map<String, String> rowData);
 	
 	public abstract String getComponentName();
 	
@@ -45,6 +49,21 @@ public abstract class BaseComponent {
 		DriverManagerHelper.sleep(2);
 		DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='"+this.getComponentName()+"']")).click();
 		DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Configure']")).click();
+	}
+	
+
+	public static List<Map<String, String>> getDataMap(String iterations)
+	{
+		if(iterations.contains("("))
+		{
+			String num = iterations.replaceAll(".*\\(|\\).*", "").trim();
+			String sheet = iterations.substring(0, iterations.lastIndexOf("("));
+			int start = Integer.parseInt(num.split(",")[0].trim())-1;
+			int end = Integer.parseInt(num.split(",")[1].trim());
+			return ReadExcel.workbookData.get(sheet).subList(start, end);
+		}
+		else
+			return ReadExcel.workbookData.get(iterations);			
 	}
 
 }

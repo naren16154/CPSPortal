@@ -3,11 +3,14 @@ package com.agilent.cps.core;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.testng.asserts.SoftAssert;
+
 import com.agilent.cps.utils.Logger;
 
 public class Verify {
 
-	public static com.agilent.cps.utils.Logger logger = Logger.getInstance();
+	public static Logger logger = Logger.getInstance();
+	public static SoftAssert softAssert;
 
 	public static void verifyEquals(String message, String expectedValue,
 			String actualValue) {
@@ -21,6 +24,7 @@ public class Verify {
 			Logger.success++;
 		else
 			Logger.fail++;
+		softAssert.assertEquals(actualValue, expectedValue, message);
 	}
 
 	public static void verifyEquals(String expectedValue, String actualValue) {
@@ -34,6 +38,7 @@ public class Verify {
 			Logger.success++;
 		else
 			Logger.fail++;
+		softAssert.assertEquals(actualValue, expectedValue);
 	}
 	
 	public static void verifyEquals(String message, Boolean result) {
@@ -42,6 +47,7 @@ public class Verify {
 			Logger.success++;
 		else
 			Logger.fail++;
+		softAssert.assertTrue(result, message);
 	}
 
 }

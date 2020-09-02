@@ -17,7 +17,7 @@ public class Constants {
 	public static String success_robot = "false";
 	public static String success_scroll = "false";
 	public static String failure_robot = "false";
-	public static String failure_scroll = "true";
+	public static String failure_scroll = "false";
 	public static String error_robot = "false";
 	public static String error_scroll = "true";
 	public static String isRCServer = "false";

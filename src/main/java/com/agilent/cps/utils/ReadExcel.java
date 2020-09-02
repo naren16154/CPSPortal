@@ -14,7 +14,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class ReadExcel {
 	
-	Map<String, List<Map<String, String>>> workbookData = new LinkedHashMap<String, List<Map<String,String>>>();
+	public static Map<String, List<Map<String, String>>> workbookData = new LinkedHashMap<String, List<Map<String,String>>>();
 	
 	public Map<String, List<Map<String, String>>> getDataFromExcel(String excelPath)
 	{
