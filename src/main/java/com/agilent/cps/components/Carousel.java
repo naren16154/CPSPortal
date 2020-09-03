@@ -8,6 +8,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import com.agilent.cps.core.DriverManagerHelper;
+import com.agilent.cps.core.Verify;
 import com.agilent.cps.widgetactions.Button;
 import com.agilent.cps.widgetactions.CheckBox;
 import com.agilent.cps.widgetactions.GUIWidget;
@@ -66,7 +67,28 @@ public class Carousel extends BaseComponent{
 	
 	@Override
 	public void verifyPreview(Map<String, String> rowData) {
-		
+		verifyCarousalList(rowData.get("addHeroComponents"));
+		verifyHeroComponents(rowData);
+	}
+	
+	public void verifyHeroComponents(Map<String, String> rowData) {
+		List<Map<String, String>> dataMap = getDataMap(rowData.get("authorHerocomponents"));
+		String[] heros = rowData.get("addHeroComponents").split("\n");
+		for(int i=0; i<heros.length; i++) {
+			DM.getCurrentWebDriver().findElement(By.xpath("//li[contains(text(), '"+heros[i]+"')]")).click();
+			DriverManagerHelper.sleep(2);
+			Map<String, String> verifyData = dataMap.get(i);
+			verifyData.remove("TestName");
+			(new Hero()).verifyPreview(verifyData);
+		}
+	}
+
+	public void verifyCarousalList(String carouselTabs) {
+		WidgetInfo carousalHeroList = new WidgetInfo("xpath=//div[@id='carousel--hero']/ol[@class='carousel-indicators']/li", GUIWidget.class);
+		List<WebElement> elementList = DMHelper.getWebElements(carousalHeroList);
+		String[] heros = carouselTabs.split("\n");
+		for(int i=0; i<heros.length; i++)
+			Verify.verifyEquals("Verifying Carousel tab"+(i+1), heros[i], elementList.get(i).getText());
 	}
 
 	@Override

@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -50,14 +49,6 @@ public class AuthorTests extends BaseAuthorTest{
 				componentElement.click();
 				DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Parent']/coral-icon")).click();
 				DM.getCurrentWebDriver().findElement(By.xpath("//coral-list-item-content[text()='Carousel']")).click();
-				/*
-				 * Actions actions = new Actions(DM.getCurrentWebDriver()); int height =
-				 * componentElement.getSize().height;
-				 * System.out.println("Y : "+componentElement.getLocation().y);
-				 * System.out.println("Offset : "+(height/2-10));
-				 * actions.moveToElement(componentElement, 0,
-				 * -(height/2-10)).click().build().perform();
-				 */
 			}else
 				componentElement.click();
 			DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Configure']")).click();

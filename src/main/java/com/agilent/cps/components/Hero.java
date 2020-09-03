@@ -35,10 +35,13 @@ public class Hero extends BaseComponent {
 
 	@Override
 	public void verifyPreview(Map<String, String> rowData) {
-		WidgetInfo heroText = new WidgetInfo("xpath=//div[@class='text-section__title']", Label.class);
-		WidgetInfo heroDescription = new WidgetInfo("xpath=//div[@class='text-section__description']", Label.class);
-		WidgetInfo brandBar = new WidgetInfo("xpath=//div[@class='brand-lines']", GUIWidget.class);
-		WidgetInfo imageSection = new WidgetInfo("xpath=//div[@class='image-section']/img", GUIWidget.class);
+		String carouselHeroText = "";
+		if(DM.widgetExists(new WidgetInfo("xpath=//div[@class='carousel-item active']", GUIWidget.class), 1, .5))
+			carouselHeroText = "//div[@class='carousel-item active']";
+		WidgetInfo heroText = new WidgetInfo("xpath="+carouselHeroText+"//div[@class='text-section__title']", Label.class);
+		WidgetInfo heroDescription = new WidgetInfo("xpath="+carouselHeroText+"//div[@class='text-section__description']", Label.class);
+		WidgetInfo brandBar = new WidgetInfo("xpath="+carouselHeroText+"//div[@class='brand-lines']", GUIWidget.class);
+		WidgetInfo imageSection = new WidgetInfo("xpath="+carouselHeroText+"//div[@class='image-section']/img", GUIWidget.class);
 		if(rowData.containsKey("heroHeadlineText"))
 			Verify.verifyEquals("Verifying Hero Text", rowData.get("heroHeadlineText"), DM.label(heroText).getDisplayValue());
 		
