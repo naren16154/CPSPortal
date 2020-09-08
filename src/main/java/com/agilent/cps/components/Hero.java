@@ -68,8 +68,6 @@ public class Hero extends BaseComponent {
 			Verify.verifyEquals("Verifying Nonpresence of Brandbar", !DM.widgetVisible(brandBar, 1, .5));
 		}
 			
-		
-		
 	}
 
 }

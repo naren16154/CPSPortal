@@ -2,7 +2,6 @@ package com.agilent.cps.components;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
-import java.util.Set;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.Color;
@@ -38,8 +37,6 @@ public class CTA extends BaseComponent {
 	@Override
 	public void verifyPreview(Map<String, String> rowData) {
 		WidgetInfo buttonLink = new WidgetInfo("linktext="+rowData.get("buttonLabel").toUpperCase(), Link.class);
-		Verify.verifyEquals("Headline link visible", DM.widgetVisible(buttonLink, 1, .5));
-		Verify.verifyEquals("Verfying Href text", DM.link(buttonLink).getAttribute("href").contains(rowData.get("buttonLink")));
 		WebElement element = DMHelper.getWebElement(buttonLink);
 		String buttonColor = rowData.getOrDefault("buttonColor", "Blue/Solid");
 		if(buttonColor.equalsIgnoreCase("Transparent")) {
@@ -55,36 +52,7 @@ public class CTA extends BaseComponent {
 			Verify.verifyEquals("Verifying button BG color", "blue", Color.fromString(element.getCssValue("background-color")).asHex());
 			Verify.verifyEquals("Verifying button does not has border", element.getCssValue("border").contains("0px none"));
 		}
-		int windowsCountBefore = DM.getCurrentWebDriver().getWindowHandles().size();
-		DM.link(buttonLink).click();
-		Set<String> windows = DM.getCurrentWebDriver().getWindowHandles();
-		if(rowData.containsKey("linkActions")) {
-			if("New tab".equalsIgnoreCase(rowData.get("linkActions"))) {
-				Verify.verifyEquals("Verfying Link Target Window", "_blank", DM.link(buttonLink).getAttribute("target"));
-				Verify.verifyEquals("Opening in same tab", windowsCountBefore+1+"", windows.size()+"");
-			}
-			else if("New window".equalsIgnoreCase(rowData.get("linkActions"))) {
-				Verify.verifyEquals("Verfying Link Target Window", "", DM.link(buttonLink).getAttribute("target"));
-				Verify.verifyEquals("Opening in same tab", windowsCountBefore+1+"", windows.size()+"");
-			}
-			else {
-				Verify.verifyEquals("Verfying Link Target Window", "_self", DM.link(buttonLink).getAttribute("target"));
-				Verify.verifyEquals("Opening in same tab", windowsCountBefore+"", windows.size()+"");
-			}
-			
-			for(String window : windows)
-				DM.getCurrentWebDriver().switchTo().window(window);
-			Verify.verifyEquals("Verifying window title", "Testing", DM.getCurrentWebDriver().getTitle());
-			DMHelper.getWebDriver().close();
-			windows = DM.getCurrentWebDriver().getWindowHandles();
-			for(String window : windows)
-				DM.getCurrentWebDriver().switchTo().window(window);
-		}else {
-			Verify.verifyEquals("Verfying Link Target Window", "_self", DM.link(buttonLink).getAttribute("target"));
-			Verify.verifyEquals("Opening in same tab", windowsCountBefore+"", windows.size()+"");
-			Verify.verifyEquals("Verifying window title", "Testing", DM.getCurrentWebDriver().getTitle());
-			DMHelper.getWebDriver().navigate().back();
-		}
+		verifyLinkOrbutton(buttonLink, rowData.getOrDefault("linkActions", "Existing window/tab"), rowData.get("buttonLink"), "Testing");
 	}
 	
 	@Override

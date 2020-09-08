@@ -11,8 +11,6 @@ import com.agilent.cps.widgetactions.RadioGroup;
 import com.agilent.cps.widgetactions.TextField;
 import com.agilent.cps.widgets.WidgetInfo;
 
-import io.appium.java_client.pagefactory.Widget;
-
 public class PEPList extends BaseComponent {
 
 	public static final String componentName = "PEP List";

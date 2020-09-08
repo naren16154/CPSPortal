@@ -3,15 +3,19 @@ package com.agilent.cps.components;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.assertj.core.util.Arrays;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import com.agilent.cps.core.AutoPopulator;
 import com.agilent.cps.core.DriverManager;
 import com.agilent.cps.core.DriverManagerHelper;
+import com.agilent.cps.core.Verify;
 import com.agilent.cps.utils.ReadExcel;
+import com.agilent.cps.widgets.WidgetInfo;
 
 public abstract class BaseComponent {
 
@@ -48,11 +52,32 @@ public abstract class BaseComponent {
 		
 		DM.getCurrentWebDriver().findElements(By.xpath("//button[@icon='check']")).get(1).click();
 		DriverManagerHelper.sleep(2);
-//		DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='"+this.getComponentName()+"']")).click();
-//		DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Configure']")).click();
 	}
 	
-
+	public void verifyLinkOrbutton(WidgetInfo widget, String linkOption, String linkUrl, String newWindowTitle) {
+		WebElement element = DMHelper.getWebElement(widget);
+		WebDriver driver = DM.getCurrentWebDriver();
+		String expectedTarget = "New tab".equalsIgnoreCase(linkOption)?"_blank":("New window".equalsIgnoreCase(linkOption)?"":"_self");
+		Verify.verifyEquals("Verfying Href text", element.getAttribute("href").contains(linkUrl));
+		Verify.verifyEquals("Verfying Link Target Window", expectedTarget, element.getAttribute("target"));
+		int windowsCountBefore = driver.getWindowHandles().size();
+		String windowBefore = driver.getWindowHandle();
+		element.click();
+		Set<String> windows = driver.getWindowHandles();
+		if("New tab".equalsIgnoreCase(linkOption) || "New window".equalsIgnoreCase(linkOption)) {
+			Verify.verifyEquals("Opening in same tab", windowsCountBefore+1+"", windows.size()+"");
+			for(String window : windows)
+				driver.switchTo().window(window);
+			Verify.verifyEquals("Verifying window title", newWindowTitle, driver.getTitle());
+			driver.close();
+			driver.switchTo().window(windowBefore);
+		}else {
+			Verify.verifyEquals("Opening in same tab", windowsCountBefore+"", windows.size()+"");
+			Verify.verifyEquals("Verifying window title", newWindowTitle, driver.getTitle());
+			driver.navigate().back();
+		}
+	}
+	
 	public static List<Map<String, String>> getDataMap(String iterations)
 	{
 		if(iterations.contains("("))

@@ -37,6 +37,7 @@ public class AuthorTests extends BaseAuthorTest{
 		if(null != componentObject)
 		{
 			String componentName = componentObject.getComponentName();
+			DriverManagerHelper.sleep(1);
 			DM.getCurrentWebDriver().findElement(By.xpath("//div[@data-text='Drag components here']")).click();
 			DM.getCurrentWebDriver().findElements(By.xpath("//button[@icon='add']/coral-icon")).get(1).click();
 			
