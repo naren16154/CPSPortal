@@ -42,7 +42,7 @@ public class AuthorTests extends BaseAuthorTest{
 			
 			DM.textField(new WidgetInfo("xpath=//coral-search//input", TextField.class)).setDisplayValue(componentName);
 			DriverManagerHelper.sleep(2);
-			DM.getCurrentWebDriver().findElement(By.xpath("//coral-selectlist-item[text()='"+componentName+"']")).click();
+			DM.getCurrentWebDriver().findElement(By.xpath("//coral-selectlist-group[@label='next-gen-acom-components.Content']//coral-selectlist-item[text()='"+componentName+"']")).click();
 			DriverManagerHelper.sleep(2);
 			WebElement componentElement = DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='"+componentName+"']"));
 			if(componentName.equalsIgnoreCase("Carousel")) {
@@ -84,10 +84,10 @@ public class AuthorTests extends BaseAuthorTest{
 			
 			DriverManagerHelper.sleep(2);
 			componentElement = DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='"+componentName+"']"));
-			if(componentName.equalsIgnoreCase("Carousel")) {
+			if(componentName.equalsIgnoreCase("Carousel") || componentName.equalsIgnoreCase("Accordion")) {
 				componentElement.click();
 				DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Parent']/coral-icon")).click();
-				DM.getCurrentWebDriver().findElement(By.xpath("//coral-list-item-content[text()='Carousel']")).click();
+				DM.getCurrentWebDriver().findElement(By.xpath("//coral-list-item-content[text()='"+componentName+"']")).click();
 			}else
 				componentElement.click();
 			DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Delete']")).click();

@@ -19,7 +19,7 @@ public class Verify {
 		Pattern pattern = Pattern.compile(expectedValue, Pattern.LITERAL);
 		Matcher matcher = pattern.matcher(actualValue);
 		boolean matchFound = matcher.matches();
-		logger.verificationPoint(message+" result="+matchFound+" expected="+expectedValue+" actual="+actualValue, matchFound);
+		logger.verificationPoint("result="+matchFound+" "+message+" expected="+expectedValue+" actual="+actualValue, matchFound);
 		if(matchFound)
 			Logger.success++;
 		else

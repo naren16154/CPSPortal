@@ -8,7 +8,7 @@
 	<test name="CPS Tests">
 		<groups>
 			<run>
-				<!-- <include name="author"></include> -->
+				<include name="author"></include>
 				<!-- <include name="test"></include> -->
 			</run>
 		</groups>

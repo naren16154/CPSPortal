@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 
 import com.agilent.cps.core.DriverManagerHelper;
 import com.agilent.cps.core.Verify;
@@ -23,6 +24,8 @@ public class Carousel extends BaseComponent{
 		public static final WidgetInfo addButton = new WidgetInfo("xpath=//button/coral-button-label[text()='Add']", Button.class);
 		public static final WidgetInfo autoSlide = new WidgetInfo("name=./autoplay", CheckBox.class);
 		public static final WidgetInfo propertiesTab = new WidgetInfo("xpath=//coral-tab/coral-tab-label[text()='Properties']", GUIWidget.class);
+		public static final WidgetInfo transitionDelay = new WidgetInfo("name=./delay", TextField.class);
+		public static final WidgetInfo pauseOnHoverDisable = new WidgetInfo("name=./autopauseDisabled", CheckBox.class); 
 	}
 	
 	public void addHeroComponents(String heroComponents) {
@@ -69,6 +72,7 @@ public class Carousel extends BaseComponent{
 	public void verifyPreview(Map<String, String> rowData) {
 		verifyCarousalList(rowData.get("addHeroComponents"));
 		verifyHeroComponents(rowData);
+		verifyAutoSlidefeature(rowData);
 	}
 	
 	public void verifyHeroComponents(Map<String, String> rowData) {
@@ -89,6 +93,60 @@ public class Carousel extends BaseComponent{
 		String[] heros = carouselTabs.split("\n");
 		for(int i=0; i<heros.length; i++)
 			Verify.verifyEquals("Verifying Carousel tab"+(i+1), heros[i], elementList.get(i).getText());
+	}
+	
+	public void verifyAutoSlidefeature(Map<String, String> rowData) {
+		String autoSlide =  rowData.get("autoTransitionSlide");
+		if("check".equalsIgnoreCase(autoSlide)) {
+			String transitionDelay = rowData.get("transitionDelay");
+			String disableTransitionOnHover = rowData.get("pauseOnHoverDisable");
+			
+			if("check".equalsIgnoreCase(disableTransitionOnHover)) {
+				WidgetInfo carousalHeroList = new WidgetInfo("xpath=//div[@id='carousel--hero']/ol[@class='carousel-indicators']/li", GUIWidget.class);
+				List<WebElement> elementList = DMHelper.getWebElements(carousalHeroList);
+				WidgetInfo carousalActiveTab = new WidgetInfo("xpath=//div[@id='carousel--hero']/ol[@class='carousel-indicators']/li[@class='active']", GUIWidget.class);
+				
+				Actions actions = new Actions(DM.getCurrentWebDriver());
+				actions.moveToElement(elementList.get(0)).perform();
+				
+				String carouselTabBefore = DM.GUIWidget(carousalActiveTab).getText();
+				DriverManagerHelper.sleep((Integer.parseInt(transitionDelay)/1000)+1);
+				String carouselTabAfter = DM.GUIWidget(carousalActiveTab).getText();
+				
+				Verify.verifyEquals("Verifying Auto Transition Auto Disabled on hover", carouselTabBefore.equalsIgnoreCase(carouselTabAfter));
+				
+				actions.moveToElement(elementList.get(0), 0, +100).perform();
+				
+				carouselTabBefore = DM.GUIWidget(carousalActiveTab).getText();
+				DriverManagerHelper.sleep((Integer.parseInt(transitionDelay)/1000)+1);
+				carouselTabAfter = DM.GUIWidget(carousalActiveTab).getText();
+				
+				Verify.verifyEquals("Verifying Auto Transition Enabled without hover", !carouselTabBefore.equalsIgnoreCase(carouselTabAfter));
+			}else {
+				WidgetInfo carousalHeroList = new WidgetInfo("xpath=//div[@id='carousel--hero']/ol[@class='carousel-indicators']/li", GUIWidget.class);
+				List<WebElement> elementList = DMHelper.getWebElements(carousalHeroList);
+				WidgetInfo carousalActiveTab = new WidgetInfo("xpath=//div[@id='carousel--hero']/ol[@class='carousel-indicators']/li[@class='active']", GUIWidget.class);
+				
+				Actions actions = new Actions(DM.getCurrentWebDriver());
+				actions.moveToElement(elementList.get(0)).perform();
+				
+				for(int i=0; i< elementList.size(); i++) {
+					String carouselTabBefore = DM.GUIWidget(carousalActiveTab).getText();
+					DriverManagerHelper.sleep((Integer.parseInt(transitionDelay)/1000)+1);
+					String carouselTabAfter = DM.GUIWidget(carousalActiveTab).getText();
+					
+					Verify.verifyEquals("Verifying Auto Transition Enabled iteration"+i, !carouselTabBefore.equalsIgnoreCase(carouselTabAfter));
+				}
+			}
+			
+		}else {
+			WidgetInfo carousalActiveTab = new WidgetInfo("xpath=//div[@id='carousel--hero']/ol[@class='carousel-indicators']/li[@class='active']", GUIWidget.class);
+			String carouselTabBefore = DM.GUIWidget(carousalActiveTab).getText();
+			DriverManagerHelper.sleep(6);
+			String carouselTabAfter = DM.GUIWidget(carousalActiveTab).getText();
+			
+			Verify.verifyEquals("Verifying Auto Transition Disabled", carouselTabBefore.equalsIgnoreCase(carouselTabAfter));
+		}
 	}
 
 	@Override

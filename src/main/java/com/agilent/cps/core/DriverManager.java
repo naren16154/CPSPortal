@@ -12,10 +12,12 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.agilent.cps.widgetactions.Button;
 import com.agilent.cps.widgetactions.CheckBox;
+import com.agilent.cps.widgetactions.DropDown;
 import com.agilent.cps.widgetactions.GUIWidget;
 import com.agilent.cps.widgetactions.Label;
 import com.agilent.cps.widgetactions.Link;
 import com.agilent.cps.widgetactions.ListBox;
+import com.agilent.cps.widgetactions.RTE;
 import com.agilent.cps.widgetactions.RadioButton;
 import com.agilent.cps.widgetactions.RadioGroup;
 import com.agilent.cps.widgetactions.TextArea;
@@ -192,6 +194,16 @@ public class DriverManager {
 	public CheckBox checkBox(WidgetInfo widgetInfo)
 	{
 		return new CheckBox(widgetInfo);
+	}
+	
+	public RTE rte(WidgetInfo widgetInfo)
+	{
+		return new RTE(widgetInfo);
+	}
+	
+	public DropDown dropDown(WidgetInfo widgetInfo)
+	{
+		return new DropDown(widgetInfo);
 	}
 	
 	public GUIWidget widget(WidgetInfo widgetInfo)
