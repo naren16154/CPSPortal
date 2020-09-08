@@ -6,9 +6,12 @@ import com.agilent.cps.widgetactions.Button;
 import com.agilent.cps.widgetactions.CheckBox;
 import com.agilent.cps.widgetactions.DropDown;
 import com.agilent.cps.widgetactions.GUIWidget;
+import com.agilent.cps.widgetactions.RTE;
 import com.agilent.cps.widgetactions.RadioGroup;
 import com.agilent.cps.widgetactions.TextField;
 import com.agilent.cps.widgets.WidgetInfo;
+
+import io.appium.java_client.pagefactory.Widget;
 
 public class PEPList extends BaseComponent {
 
@@ -32,7 +35,23 @@ public class PEPList extends BaseComponent {
 		
 //		Fixed List Options
 		public static final WidgetInfo addButton = new WidgetInfo("xpath=//button/coral-button-label[text()='Add']", Button.class);
-		
+		public static final WidgetInfo page = new WidgetInfo("xpath=//foundation-autocomplete[@name='./fixedlist/item0/./pages']//input", TextField.class);
+		public static final WidgetInfo hidePEPImage = new WidgetInfo("name=./fixedlist/item0/./hideimage", CheckBox.class);
+		public static final WidgetInfo image = new WidgetInfo("xpath=//foundation-autocomplete[@name='./fixedlist/item0/./images']//input", TextField.class);
+		public static final WidgetInfo hidePEPDescriptionFixed = new WidgetInfo("name=./fixedlist/item0/./hidedescription", CheckBox.class);
+		public static final WidgetInfo description = new WidgetInfo("name=./fixedlist/item0/./description", RTE.class);
+		public static final WidgetInfo hidePEPTags = new WidgetInfo("name=./fixedlist/item0/./hidecategorytags", CheckBox.class);
+		public static final WidgetInfo categoryTag = new WidgetInfo("xpath=//foundation-autocomplete[@name='./fixedlist/item0/./cattag']//input", TextField.class);
+		public static final WidgetInfo featureFlag = new WidgetInfo("name=./fixedlist/item0/./flag", CheckBox.class);
+		public static final WidgetInfo buttonText = new WidgetInfo("name=./fixedlist/item0/./ctatext", TextField.class);
+		public static final WidgetInfo buttonLink = new WidgetInfo("name=./fixedlist/item0/./ctalink", TextField.class);
+		public static final WidgetInfo buttonLinkAction = new WidgetInfo("name=./fixedlist/item0/./ctalinkaction", DropDown.class);
+		public static final WidgetInfo buttonIconPosition = new WidgetInfo("name=./fixedlist/item0/./ctaposition", DropDown.class);
+		public static final WidgetInfo showWebinarProps = new WidgetInfo("name=./fixedlist/item0/./webcheck", CheckBox.class);
+		public static final WidgetInfo headlineText = new WidgetInfo("name=./fixedlist/item0/./headlineText", TextField.class);
+		public static final WidgetInfo eventDate = new WidgetInfo("xpath=//coral-datepicker[@name='./fixedlist/item0/./eventDate']//input", TextField.class);
+		public static final WidgetInfo eventPresenterName = new WidgetInfo("name=./fixedlist/item0/./eventPresenterName", TextField.class);
+		public static final WidgetInfo eventPresenterTitle = new WidgetInfo("name=./fixedlist/item0/./eventPresenterTitle", TextField.class);
 		
 	}
 	
