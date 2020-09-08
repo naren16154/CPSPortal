@@ -126,38 +126,6 @@ public class Accordion extends BaseComponent{
 			WidgetInfo link = new WidgetInfo("linktext="+linkDetails.get("linkText"), Link.class);
 			Verify.verifyEquals("Verfying Link Color", "", Color.fromString(DMHelper.getWebElement(link).getCssValue("color")).asHex());
 			verifyLinkOrbutton(link, linkDetails.getOrDefault("linkAction", "Existing window/tab"), linkDetails.get("headlineLink"), "Testing");
-			/*
-			 * int windowsCountBefore = DM.getCurrentWebDriver().getWindowHandles().size();
-			 * DM.link(link).click(); Set<String> windows =
-			 * DM.getCurrentWebDriver().getWindowHandles();
-			 * if(linkDetails.containsKey("linkAction")) { String linkAction =
-			 * linkDetails.get("linkAction"); if("New tab".equalsIgnoreCase(linkAction)) {
-			 * Verify.verifyEquals("Verfying Link Target Window", "_blank",
-			 * DM.link(link).getAttribute("target"));
-			 * Verify.verifyEquals("Opening in same tab", windowsCountBefore+1+"",
-			 * windows.size()+""); } else if("New window".equalsIgnoreCase(linkAction)) {
-			 * Verify.verifyEquals("Verfying Link Target Window", "",
-			 * DM.link(link).getAttribute("target"));
-			 * Verify.verifyEquals("Opening in same tab", windowsCountBefore+1+"",
-			 * windows.size()+""); } else {
-			 * Verify.verifyEquals("Verfying Link Target Window", "_self",
-			 * DM.link(link).getAttribute("target"));
-			 * Verify.verifyEquals("Opening in same tab", windowsCountBefore+"",
-			 * windows.size()+""); }
-			 * 
-			 * for(String window : windows)
-			 * DM.getCurrentWebDriver().switchTo().window(window);
-			 * Verify.verifyEquals("Verifying window title", "Testing",
-			 * DM.getCurrentWebDriver().getTitle()); DMHelper.getWebDriver().close();
-			 * windows = DM.getCurrentWebDriver().getWindowHandles(); for(String window :
-			 * windows) DM.getCurrentWebDriver().switchTo().window(window); }else {
-			 * Verify.verifyEquals("Verfying Link Target Window", "_self",
-			 * DM.link(link).getAttribute("target"));
-			 * Verify.verifyEquals("Opening in same tab", windowsCountBefore+"",
-			 * windows.size()+""); Verify.verifyEquals("Verifying window title", "Testing",
-			 * DM.getCurrentWebDriver().getTitle());
-			 * DMHelper.getWebDriver().navigate().back(); }
-			 */
 		}else {
 			WidgetInfo link = new WidgetInfo("xpath=//ul[contains(text(),'"+linkDetails.get("linkText")+"')]", GUIWidget.class);
 			Verify.verifyEquals("Verfying Link Color", textColor, Color.fromString(DMHelper.getWebElement(link).getCssValue("color")).asHex());
