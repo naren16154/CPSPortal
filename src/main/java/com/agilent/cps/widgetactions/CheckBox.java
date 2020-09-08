@@ -23,9 +23,7 @@ public class CheckBox extends GUIWidget implements IGUIWidget{
 		for (WebElement ele : elements)
 			element = ele;
 		boolean selected = element.isSelected();
-		if((!selected) && key_Check.equals(value))
-			clickJS(element);
-		if(selected && (!key_Uncheck.equals(value)))
+		if(selected ^ (!key_Uncheck.equals(value)))
 			element.click();
 	}
 

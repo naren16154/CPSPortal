@@ -115,7 +115,7 @@ public class Carousel extends BaseComponent{
 				
 				Verify.verifyEquals("Verifying Auto Transition Auto Disabled on hover", carouselTabBefore.equalsIgnoreCase(carouselTabAfter));
 				
-				actions.moveToElement(elementList.get(0), 0, +100).perform();
+				actions.moveToElement(elementList.get(0), 0, +70).perform();
 				
 				carouselTabBefore = DM.GUIWidget(carousalActiveTab).getText();
 				DriverManagerHelper.sleep((Integer.parseInt(transitionDelay)/1000)+1);

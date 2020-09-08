@@ -8,6 +8,7 @@ import org.openqa.selenium.interactions.Actions;
 
 import com.agilent.cps.core.AutoPopulator;
 import com.agilent.cps.core.DriverManagerHelper;
+import com.agilent.cps.core.Verify;
 import com.agilent.cps.widgetactions.Button;
 import com.agilent.cps.widgetactions.CheckBox;
 import com.agilent.cps.widgetactions.GUIWidget;
@@ -47,7 +48,14 @@ public class Image extends BaseComponent{
 	
 	@Override
 	public void verifyPreview(Map<String, String> rowData) {
-		
+		WidgetInfo img = new WidgetInfo("xpath=//img[@data-mode='smartcrop']", GUIWidget.class);
+		Verify.verifyEquals("Verifying presence of Image", DM.widgetVisible(img, 1, .5));
+		Verify.verifyEquals("Verifying Alt Text", rowData.get("altText"), DM.GUIWidget(img).getAttribute("alt"));
+		Verify.verifyEquals("Verifying Image src", rowData.get("dropImage"), DM.GUIWidget(img).getAttribute("src"));
+		if(rowData.getOrDefault("captionAsPopup", "CHECK").equalsIgnoreCase("CHECK"))
+			Verify.verifyEquals("Verifying Image Caption", rowData.get("imageCaption"), DM.GUIWidget(new WidgetInfo("xpath=//meta[@itemprop='caption']", GUIWidget.class)).getAttribute("content"));
+		else
+			Verify.verifyEquals("Verifying Image Caption", rowData.get("imageCaption"), DM.GUIWidget(new WidgetInfo("xpath=//span[@itemprop='caption']", GUIWidget.class)).getText());
 	}
 
 	@Override

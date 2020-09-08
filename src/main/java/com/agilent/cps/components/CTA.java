@@ -41,9 +41,17 @@ public class CTA extends BaseComponent {
 		Verify.verifyEquals("Headline link visible", DM.widgetVisible(buttonLink, 1, .5));
 		Verify.verifyEquals("Verfying Href text", DM.link(buttonLink).getAttribute("href").contains(rowData.get("buttonLink")));
 		WebElement element = DMHelper.getWebElement(buttonLink);
-		System.out.println(Color.fromString(element.getCssValue("color")).asHex());
-		System.out.println(Color.fromString(element.getCssValue("background-color")).asHex());
-		System.out.println(element.getCssValue("border"));
+		String buttonColor = rowData.getOrDefault("buttonColor", "Blue/Solid");
+		if(buttonColor.equalsIgnoreCase("Transparent")) {
+			Verify.verifyEquals("Verifying button text color", "blue", Color.fromString(element.getCssValue("color")).asHex());
+			Verify.verifyEquals("Verifying button BG color", "white", Color.fromString(element.getCssValue("background-color")).asHex());
+		}else if(buttonColor.equalsIgnoreCase("Text")) {
+			Verify.verifyEquals("Verifying button text color", "blue", Color.fromString(element.getCssValue("color")).asHex());
+			Verify.verifyEquals("Verifying button BG color", "white", Color.fromString(element.getCssValue("background-color")).asHex());
+		}else {
+			Verify.verifyEquals("Verifying button text color", "white", Color.fromString(element.getCssValue("color")).asHex());
+			Verify.verifyEquals("Verifying button BG color", "blue", Color.fromString(element.getCssValue("background-color")).asHex());
+		}
 		int windowsCountBefore = DM.getCurrentWebDriver().getWindowHandles().size();
 		DM.link(buttonLink).click();
 		Set<String> windows = DM.getCurrentWebDriver().getWindowHandles();
