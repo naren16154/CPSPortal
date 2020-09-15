@@ -30,7 +30,7 @@ public class CheckBox extends GUIWidget implements IGUIWidget{
 	@Override
 	public String getDisplayValue() {
 		WebElement element = managerHelper.getWebElement(widgetInfo);
-		return element.getText().trim();
+		return String.valueOf(element.isSelected());
 	}
 	
 	public void check()

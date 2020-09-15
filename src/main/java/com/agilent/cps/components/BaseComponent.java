@@ -15,7 +15,6 @@ import com.agilent.cps.core.DriverManager;
 import com.agilent.cps.core.DriverManagerHelper;
 import com.agilent.cps.core.Verify;
 import com.agilent.cps.utils.ReadExcel;
-import com.agilent.cps.widgets.WidgetInfo;
 
 public abstract class BaseComponent {
 
@@ -54,8 +53,7 @@ public abstract class BaseComponent {
 		DriverManagerHelper.sleep(2);
 	}
 	
-	public void verifyLinkOrbutton(WidgetInfo widget, String linkOption, String linkUrl, String newWindowTitle) {
-		WebElement element = DMHelper.getWebElement(widget);
+	public void verifyLinkOrbutton(WebElement element, String linkOption, String linkUrl, String newWindowTitle) {
 		WebDriver driver = DM.getCurrentWebDriver();
 		String expectedTarget = "New tab".equalsIgnoreCase(linkOption)?"_blank":("New window".equalsIgnoreCase(linkOption)?"":"_self");
 		Verify.verifyEquals("Verfying Href text", element.getAttribute("href").contains(linkUrl));

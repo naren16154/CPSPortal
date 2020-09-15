@@ -57,4 +57,9 @@ public class GUIWidget implements IGUIWidget{
 		WebElement element = managerHelper.getWebElement(widgetInfo);
 		return element.getAttribute(attributeName);
 	}
+	public String getCSSValue(String propertyName)
+	{
+		WebElement element = managerHelper.getWebElement(widgetInfo);
+		return element.getCssValue(propertyName);
+	}
 }

@@ -36,23 +36,23 @@ public class CTA extends BaseComponent {
 	
 	@Override
 	public void verifyPreview(Map<String, String> rowData) {
-		WidgetInfo buttonLink = new WidgetInfo("linktext="+rowData.get("buttonLabel").toUpperCase(), Link.class);
+		WidgetInfo buttonLink = new WidgetInfo("linktext="+rowData.get("buttonLabel"), Link.class);
 		WebElement element = DMHelper.getWebElement(buttonLink);
 		String buttonColor = rowData.getOrDefault("buttonColor", "Blue/Solid");
 		if(buttonColor.equalsIgnoreCase("Transparent")) {
-			Verify.verifyEquals("Verifying button text color", "blue", Color.fromString(element.getCssValue("color")).asHex());
-			Verify.verifyEquals("Verifying button BG color", "white", Color.fromString(element.getCssValue("background-color")).asHex());
+			Verify.verifyEquals("Verifying button text color", "#0085d5", Color.fromString(element.getCssValue("color")).asHex());
+			Verify.verifyEquals("Verifying button BG color", "#000000", Color.fromString(element.getCssValue("background-color")).asHex());
 			Verify.verifyEquals("Verifying that button has border", element.getCssValue("border").contains("1px solid"));
 		}else if(buttonColor.equalsIgnoreCase("Text")) {
-			Verify.verifyEquals("Verifying button text color", "blue", Color.fromString(element.getCssValue("color")).asHex());
-			Verify.verifyEquals("Verifying button BG color", "white", Color.fromString(element.getCssValue("background-color")).asHex());
+			Verify.verifyEquals("Verifying button text color", "#0085d5", Color.fromString(element.getCssValue("color")).asHex());
+			Verify.verifyEquals("Verifying button BG color", "#000000", Color.fromString(element.getCssValue("background-color")).asHex());
 			Verify.verifyEquals("Verifying button does not has border", element.getCssValue("border").contains("0px none"));
 		}else {
-			Verify.verifyEquals("Verifying button text color", "white", Color.fromString(element.getCssValue("color")).asHex());
-			Verify.verifyEquals("Verifying button BG color", "blue", Color.fromString(element.getCssValue("background-color")).asHex());
+			Verify.verifyEquals("Verifying button text color", "#ffffff", Color.fromString(element.getCssValue("color")).asHex());
+			Verify.verifyEquals("Verifying button BG color", "#0085d5", Color.fromString(element.getCssValue("background-color")).asHex());
 			Verify.verifyEquals("Verifying button does not has border", element.getCssValue("border").contains("0px none"));
 		}
-		verifyLinkOrbutton(buttonLink, rowData.getOrDefault("linkActions", "Existing window/tab"), rowData.get("buttonLink"), "Testing");
+		verifyLinkOrbutton(element, rowData.getOrDefault("linkActions", "Existing window/tab"), rowData.get("buttonLink"), "Testing | Agilent");
 	}
 	
 	@Override

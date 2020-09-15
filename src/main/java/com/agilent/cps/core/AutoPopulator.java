@@ -14,17 +14,28 @@ public class AutoPopulator {
 	public static DriverManagerHelper managerHelper = DriverManagerHelper.getInstance();
 	public static com.agilent.cps.utils.Logger logger = Logger.getInstance();
 	
-	public static void populate(Object screenObject, Map<String, String> dataMap) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException
+	public static void populate(Object screenObject, Map<String, String> dataMap, Object... indexes) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException
 	{
 		Map<String, WidgetInfo> widgetInfoMap = managerHelper.getWidgetInfos(screenObject);
 		logger.info("Auto population started... in screen : "+screenObject.getClass().getSimpleName());
 		Method method = null;
+		Boolean updateLocator = false;
+		String oldLocator = null;
 		for(String fieldName : dataMap.keySet())
 		{
 			if(widgetInfoMap.containsKey(fieldName))
 			{
 				WidgetInfo widgetInfo = widgetInfoMap.get(fieldName);
+				if(0<indexes.length) {
+					oldLocator = widgetInfo.getLocatorString();
+					widgetInfo.setLocatorString(String.format(oldLocator, indexes));
+					updateLocator = true;
+				}
 				populateWidget(widgetInfo, fieldName, dataMap.get(fieldName));
+				if(updateLocator) {
+					widgetInfo.setLocatorString(oldLocator);
+					updateLocator = false;
+				}
 			}
 			else if(null != (method=methodFound(screenObject, fieldName))){
 				logger.method(fieldName+" -- invoked in screen : "+screenObject.getClass().getSimpleName());

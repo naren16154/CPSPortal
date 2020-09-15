@@ -22,7 +22,7 @@ public class Hero extends BaseComponent {
 		public static final WidgetInfo backgroungImage = new WidgetInfo("name=./file", TextField.class);
 		public static final WidgetInfo addButton = new WidgetInfo("xpath=//coral-button-label[text()='Add']", Button.class);
 		public static final WidgetInfo buttonLink = new WidgetInfo("name=./cta/item0/./link", TextField.class);
-		public static final WidgetInfo buttonText = new WidgetInfo("name=./cta/item0/./text", TextField.class);
+		public static final WidgetInfo buttonText = new WidgetInfo("name=./cta/item0/./ctatext", TextField.class);
 		public static final WidgetInfo buttonLinkOpens = new WidgetInfo("name=./cta/item0/./openpage", ListBox.class);
 		public static final WidgetInfo buttonColor = new WidgetInfo("name=./cta/item0/./ctacolor", ListBox.class);
 		
@@ -54,7 +54,7 @@ public class Hero extends BaseComponent {
 		}
 		
 		if(rowData.containsKey("addButton")) {
-			WidgetInfo heroButton = new WidgetInfo("linktext="+rowData.get("buttonText").toUpperCase(), Link.class);
+			WidgetInfo heroButton = new WidgetInfo("linktext="+rowData.get("buttonText"), Link.class);
 			Verify.verifyEquals("Verifying CTA Href", DM.GUIWidget(heroButton).getAttribute("href").contains(rowData.get("buttonLink")));
 			DM.GUIWidget(heroButton).click();
 			Verify.verifyEquals("Verifying window title", "Atlas of Stains", DM.getCurrentWebDriver().getTitle());

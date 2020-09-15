@@ -12,6 +12,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.agilent.cps.widgetactions.Button;
 import com.agilent.cps.widgetactions.CheckBox;
+import com.agilent.cps.widgetactions.ComboBox;
 import com.agilent.cps.widgetactions.DropDown;
 import com.agilent.cps.widgetactions.GUIWidget;
 import com.agilent.cps.widgetactions.Label;
@@ -244,6 +245,11 @@ public class DriverManager {
 	public TextField textField(WidgetInfo widgetInfo)
 	{
 		return new TextField(widgetInfo);
+	}
+	
+	public ComboBox comboBox(WidgetInfo widgetInfo)
+	{
+		return new ComboBox(widgetInfo);
 	}
 	
 	public GUIWidget GUIWidget(WidgetInfo widgetInfo)

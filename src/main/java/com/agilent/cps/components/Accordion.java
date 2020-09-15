@@ -102,29 +102,31 @@ public class Accordion extends BaseComponent{
 	public void verifyLinkLists(String linkIterations) {
 		List<WebElement> accordionCards = DMHelper.getWebElements(new WidgetInfo("xpath=//div[@id='accordionBlock']/section/div", GUIWidget.class));
 		List<Map<String, String>> linksData = getDataMap(linkIterations);
-		int iteration=0;
-		for(WebElement card : accordionCards) {
-			String iconType = linksData.get(iteration).getOrDefault("bulletIcon", "Standard Bullet");
-			String textColor = linksData.get(iteration).getOrDefault("textColor", "Gray");
-			String linkIterationDetails = linksData.get(iteration).get("addLinks");
+		for(int i=0; i<accordionCards.size(); i++) {
+			String iconType = linksData.get(i).getOrDefault("bulletIcon", "Standard Bullet");
+			String textColor = linksData.get(i).getOrDefault("textColor", "Black");
+			String linkIterationDetails = linksData.get(i).get("addLinks");
 			List<Map<String, String>> linksDetails = getDataMap(linkIterationDetails);
-			if("card".equals(card.getAttribute("class")))
-				card.click();
-			WebElement linkList = card.findElement(By.tagName("ul"));
+			if("card".equals(accordionCards.get(i).getAttribute("class")))
+				accordionCards.get(i).findElement(By.tagName("a")).click();
+			WebElement linkList = accordionCards.get(i).findElement(By.tagName("ul"));
 			List<WebElement> linkIcons = linkList.findElements(By.tagName("i"));
-			for(int i=0; i<linkIcons.size(); i++) {
-				Verify.verifyEquals("Verifying bullet list type", "Standard Bullet".equals(iconType)? "fa fa-circle": "fa fa-check", linkIcons.get(i).getAttribute("class"));
-				verifyLinkFunctionality(textColor, linkIcons.get(i), linksDetails.get(i));
+			for(int j=0; j<linkIcons.size(); j++) {
+				Verify.verifyEquals("Verifying bullet list type", "Standard Bullet".equals(iconType)? "fa fa-circle": "fa fa-check", linkIcons.get(j).getAttribute("class"));
+				verifyLinkFunctionality(textColor, linkIcons.get(j), linksDetails.get(j));
+				accordionCards = DMHelper.getWebElements(new WidgetInfo("xpath=//div[@id='accordionBlock']/section/div", GUIWidget.class));
+				linkList = accordionCards.get(i).findElement(By.tagName("ul"));
+				linkIcons = linkList.findElements(By.tagName("i"));
+				if("card".equals(accordionCards.get(i).getAttribute("class")))
+					accordionCards.get(i).findElement(By.tagName("a")).click();
 			}
-			
-			iteration++;
 		}
 	}
 
 	private void verifyLinkFunctionality(String textColor, WebElement webElement, Map<String, String> linkDetails) {
 		if(linkDetails.containsKey("headlineLink")) {
-			WidgetInfo link = new WidgetInfo("linktext="+linkDetails.get("linkText"), Link.class);
-			Verify.verifyEquals("Verfying Link Color", "", Color.fromString(DMHelper.getWebElement(link).getCssValue("color")).asHex());
+			WebElement link = DMHelper.getWebElement(new WidgetInfo("linktext="+linkDetails.get("linkText"), Link.class));
+			Verify.verifyEquals("Verfying Link Color", "#0085d5", Color.fromString(link.getCssValue("color")).asHex());
 			verifyLinkOrbutton(link, linkDetails.getOrDefault("linkAction", "Existing window/tab"), linkDetails.get("headlineLink"), "Testing");
 		}else {
 			WidgetInfo link = new WidgetInfo("xpath=//ul[contains(text(),'"+linkDetails.get("linkText")+"')]", GUIWidget.class);

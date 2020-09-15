@@ -55,7 +55,6 @@ public class AuthorTests extends BaseAuthorTest{
 			DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Configure']")).click();
 			DriverManagerHelper.sleep(2);
 			componentObject.populate(rowData);
-			DriverManagerHelper.sleep(2);
 			if(DM.widgetEnabled(new WidgetInfo("xpath=//button[@title='Done']", Button.class), 1, .5)) {
 				DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Done']")).click();
 				DriverManagerHelper.sleep(2);

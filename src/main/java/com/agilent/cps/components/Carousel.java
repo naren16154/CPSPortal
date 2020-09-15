@@ -99,29 +99,28 @@ public class Carousel extends BaseComponent{
 		String autoSlide =  rowData.get("autoTransitionSlide");
 		if("check".equalsIgnoreCase(autoSlide)) {
 			String transitionDelay = rowData.get("transitionDelay");
-			String disableTransitionOnHover = rowData.get("pauseOnHoverDisable");
+			String disableTransitionOnHover = rowData.getOrDefault("pauseOnHoverDisable", "uncheck");
 			
-			if("check".equalsIgnoreCase(disableTransitionOnHover)) {
+			if("uncheck".equalsIgnoreCase(disableTransitionOnHover)) {
 				WidgetInfo carousalHeroList = new WidgetInfo("xpath=//div[@id='carousel--hero']/ol[@class='carousel-indicators']/li", GUIWidget.class);
 				List<WebElement> elementList = DMHelper.getWebElements(carousalHeroList);
 				WidgetInfo carousalActiveTab = new WidgetInfo("xpath=//div[@id='carousel--hero']/ol[@class='carousel-indicators']/li[@class='active']", GUIWidget.class);
-				
-				Actions actions = new Actions(DM.getCurrentWebDriver());
-				actions.moveToElement(elementList.get(0)).perform();
 				
 				String carouselTabBefore = DM.GUIWidget(carousalActiveTab).getText();
 				DriverManagerHelper.sleep((Integer.parseInt(transitionDelay)/1000)+1);
 				String carouselTabAfter = DM.GUIWidget(carousalActiveTab).getText();
 				
-				Verify.verifyEquals("Verifying Auto Transition Auto Disabled on hover", carouselTabBefore.equalsIgnoreCase(carouselTabAfter));
+				Verify.verifyEquals("Verifying Auto Transition Enabled without hover", !carouselTabBefore.equalsIgnoreCase(carouselTabAfter));
 				
-				actions.moveToElement(elementList.get(0), 0, +70).perform();
+				Actions actions = new Actions(DM.getCurrentWebDriver());
+				actions.moveToElement(elementList.get(0)).perform();
 				
 				carouselTabBefore = DM.GUIWidget(carousalActiveTab).getText();
 				DriverManagerHelper.sleep((Integer.parseInt(transitionDelay)/1000)+1);
 				carouselTabAfter = DM.GUIWidget(carousalActiveTab).getText();
 				
-				Verify.verifyEquals("Verifying Auto Transition Enabled without hover", !carouselTabBefore.equalsIgnoreCase(carouselTabAfter));
+				Verify.verifyEquals("Verifying Auto Transition Disabled with hover", carouselTabBefore.equalsIgnoreCase(carouselTabAfter));
+				
 			}else {
 				WidgetInfo carousalHeroList = new WidgetInfo("xpath=//div[@id='carousel--hero']/ol[@class='carousel-indicators']/li", GUIWidget.class);
 				List<WebElement> elementList = DMHelper.getWebElements(carousalHeroList);
@@ -135,7 +134,7 @@ public class Carousel extends BaseComponent{
 					DriverManagerHelper.sleep((Integer.parseInt(transitionDelay)/1000)+1);
 					String carouselTabAfter = DM.GUIWidget(carousalActiveTab).getText();
 					
-					Verify.verifyEquals("Verifying Auto Transition Enabled iteration"+i, !carouselTabBefore.equalsIgnoreCase(carouselTabAfter));
+					Verify.verifyEquals("Verifying Auto Transition Enabled Though We Hover iteration"+i, !carouselTabBefore.equalsIgnoreCase(carouselTabAfter));
 				}
 			}
 			
