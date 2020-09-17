@@ -1,13 +1,17 @@
 package com.agilent.cps.author;
 
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.xml.transform.OutputKeys;
@@ -36,7 +40,6 @@ import com.agilent.cps.utils.Browser;
 import com.agilent.cps.utils.Constants;
 import com.agilent.cps.utils.Logger;
 import com.agilent.cps.widgetactions.Button;
-import com.agilent.cps.widgetactions.GUIWidget;
 import com.agilent.cps.widgetactions.TextField;
 import com.agilent.cps.widgets.WidgetInfo;
 
@@ -47,10 +50,12 @@ public class BaseAuthorTest implements ITest{
 	Map<String, BaseComponent> screenMap = new HashMap<String, BaseComponent>();
 	
 	Logger logger = Logger.getInstance();
+	DriverManager DM = DriverManager.getInstance();
 	public static Date startTime;
+	public static Properties configProperties = new Properties();
 	
 	@BeforeSuite(alwaysRun = true)
-	public void setup() throws IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+	public void setup() throws IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, FileNotFoundException, IOException {
 		startTime = Calendar.getInstance().getTime();
 		configurationSetup();
 		logSetupInformation();
@@ -66,6 +71,7 @@ public class BaseAuthorTest implements ITest{
 				e.printStackTrace();
 			}
 		}
+		configProperties.load(new FileInputStream("config.properties"));
 	}
 	
 	@AfterSuite(alwaysRun = true)
@@ -86,47 +92,87 @@ public class BaseAuthorTest implements ITest{
 	
 	@BeforeClass(alwaysRun = true)
 	public void launchBrowser() {
-		DriverManager DM = DriverManager.getInstance();
-		browser.startBrowser("http://localhost:4502/");
+		String url;
+		String username;
+		String password;
+		String envType = System.getProperty("env");
+		if("dev".equalsIgnoreCase(envType)) {
+			logger.info("Executing in DEV environment");
+			url = configProperties.getProperty("dev_url");
+			username = configProperties.getProperty("dev_username");
+			password = configProperties.getProperty("dev_password");
+		}else if("stage".equalsIgnoreCase(envType)) {
+			logger.info("Executing in STAGE environment");
+			url = configProperties.getProperty("stage_url");
+			username = configProperties.getProperty("stage_username");
+			password = configProperties.getProperty("stage_password");
+		}else {
+			logger.info("Executing in LOCAL instance");
+			url = configProperties.getProperty("local_url");
+			username = configProperties.getProperty("local_username");
+			password = configProperties.getProperty("local_password");
+		}
+		browser.startBrowser(url);
 		
-		DM.textField(new WidgetInfo("id=username", TextField.class)).setDisplayValue("admin");
-		DM.textField(new WidgetInfo("id=password", TextField.class)).setDisplayValue("admin");
+		DM.textField(new WidgetInfo("id=username", TextField.class)).setDisplayValue(username);
+		DM.textField(new WidgetInfo("id=password", TextField.class)).setDisplayValue(password);
 		DM.button(new WidgetInfo("id=submit-button", Button.class)).click();
-		DM.GUIWidget(new WidgetInfo("xpath=//div[text()='Sites']", GUIWidget.class)).click();
 		
-		String[] path = {"pathology-education","Language Masters","English","Testing"};
-		
-		for(int i=0; i<path.length; i++) {
-			if(i != path.length-1) {
-				DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='"+path[i]+"']")).click();
-			}else {
-				DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='"+path[i]+"']/../..//img")).click();
-			}
-		}
-		
-		DM.getCurrentWebDriver().findElement(By.xpath("//button/coral-button-label[contains(text(), 'Edit')]")).click();
-		
-		for(int i=0; i<=6; i++) {
-			DriverManagerHelper.sleep(5);
-			if(DM.getCurrentWebDriver().getWindowHandles().size()==2)
-				break;
-		}
-		for(String window : DM.getCurrentWebDriver().getWindowHandles())
-			DM.getCurrentWebDriver().switchTo().window(window);
+		/*
+		 * String[] path = { "pathology-education", "Language Masters", "English",
+		 * "Testing" };
+		 * 
+		 * for (int i = 0; i < path.length; i++) { if (i != path.length - 1) {
+		 * DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='" + path[i] +
+		 * "']")).click(); } else {
+		 * DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='" + path[i] +
+		 * "']/../..//img")).click(); } }
+		 * 
+		 * DM.getCurrentWebDriver().findElement(By.
+		 * xpath("//button/coral-button-label[contains(text(), 'Edit')]")).click();
+		 * 
+		 * for (int i = 0; i <= 6; i++) { DriverManagerHelper.sleep(5); if
+		 * (DM.getCurrentWebDriver().getWindowHandles().size() == 2) break; } for
+		 * (String window : DM.getCurrentWebDriver().getWindowHandles())
+		 * DM.getCurrentWebDriver().switchTo().window(window);
+		 */
+		 
 	}
 	
 	@BeforeMethod(alwaysRun = true)
-	public void beforeMethod(Object[] args) {
-		testname=(String) args[1];
+	public void beforeMethod(Method method, Object[] args) {
+		if(args.length>0)
+			testname=(String) args[1];
+		else
+			testname = method.getName();
 	}
 	
 	@AfterMethod(alwaysRun = true)
 	public void afterMethod() {
-		
 	}
 	
 	@AfterClass(alwaysRun = true)
 	public void teardown() {
+		DriverManagerHelper.getInstance().switchWindow("AEM Sites");
+		
+		String[] path = configProperties.getProperty("authorPagePath").split("/");
+
+		for (int i = 0; i < path.length; i++) {
+			if (i != path.length - 1)
+				DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='" + path[i] + "']")).click();
+			else
+				DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='" + path[i] + "']/../..//img")).click();
+			DriverManagerHelper.sleep(1);
+		}
+		
+		DM.button(new WidgetInfo("xpath=//button[@icon='more']", Button.class)).click();
+		
+		DM.getCurrentWebDriver().findElement(By.xpath("//button/coral-button-label[contains(text(),'Delete')]")).click();
+		
+		DM.getCurrentWebDriver().findElements(By.xpath("//button/coral-button-label[text()='Delete']")).get(1).click();
+		
+		DriverManagerHelper.sleep(2);
+		
 		DriverManagerHelper.getInstance().tearDown();
 	}
 

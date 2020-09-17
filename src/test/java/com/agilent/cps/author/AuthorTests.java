@@ -16,6 +16,8 @@ import com.agilent.cps.core.Verify;
 import com.agilent.cps.utils.ReadExcel;
 import com.agilent.cps.utils.ScreenShotUtility;
 import com.agilent.cps.widgetactions.Button;
+import com.agilent.cps.widgetactions.GUIWidget;
+import com.agilent.cps.widgetactions.Link;
 import com.agilent.cps.widgetactions.TextField;
 import com.agilent.cps.widgets.WidgetInfo;
 
@@ -29,7 +31,7 @@ public class AuthorTests extends BaseAuthorTest{
 		dataMap = (new ReadExcel()).getDataFromExcel("Authoring_TestData.xlsx");
 	}
 	
-	@Test(groups= {"author"}, dataProvider = "getAuthorTestNames")
+	@Test(groups= {"author"}, dataProvider = "getAuthorTestNames", dependsOnMethods = {"createPageForAuthorTests"})
 	public void runAuthorTests(String component, String testName, int rowCount) throws Exception {
 		Map<String, String> rowData = dataMap.get(component).get(rowCount);
 		rowData.remove("TestName");
@@ -98,6 +100,37 @@ public class AuthorTests extends BaseAuthorTest{
 		}
 		else
 			throw new Exception("Unable to find screen object");
+	}
+	
+	@Test(groups= {"author"}, priority = 0)
+	public void createPageForAuthorTests() throws Exception {
+		DM.GUIWidget(new WidgetInfo("xpath=//div[text()='Sites']", GUIWidget.class)).click();
+		
+		String pagePath = configProperties.getProperty("authorPagePath");
+		String[] path = pagePath.split("/");
+		
+		for(int i=0; i<path.length; i++) {
+			if(i != path.length-1) {
+				DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='"+path[i]+"']")).click();
+			}else {
+				DM.GUIWidget(new WidgetInfo("xpath=//button/coral-button-label[text()='Create']", GUIWidget.class)).click();
+				DM.link(new WidgetInfo("linktext=Page", Link.class)).click();
+				DM.GUIWidget(new WidgetInfo("xpath=//coral-card-title[text()='PEP Core Template']", GUIWidget.class)).click();
+				DM.GUIWidget(new WidgetInfo("xpath=//button/coral-button-label[text()='Next']", GUIWidget.class)).click();
+				DM.textField(new WidgetInfo("name=./jcr:title", TextField.class)).setDisplayValue(path[i]);
+				DM.GUIWidget(new WidgetInfo("xpath=//button/coral-button-label[text()='Create']", GUIWidget.class)).click();
+				DM.GUIWidget(new WidgetInfo("xpath=//button/coral-button-label[text()='Open']", GUIWidget.class)).click();
+			}
+		}
+		
+		for(int i=0; i<=6; i++) {
+			DriverManagerHelper.sleep(5);
+			if(DM.getCurrentWebDriver().getWindowHandles().size()==2)
+				break;
+		}
+		for(String window : DM.getCurrentWebDriver().getWindowHandles())
+			DM.getCurrentWebDriver().switchTo().window(window);
+		
 	}
 	
 	@DataProvider(name="getAuthorTestNames")

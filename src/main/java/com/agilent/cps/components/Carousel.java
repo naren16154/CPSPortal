@@ -54,6 +54,7 @@ public class Carousel extends BaseComponent{
 		List<WebElement> heroComponents = DM.getCurrentWebDriver().findElements(By.xpath("//div[@title='herocomponent']"));
 		for(int i=0; i<heroComponents.size(); i++) {
 			heroComponents.get(0).click();
+			DriverManagerHelper.sleep(.5);
 			DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Configure']")).click();
 			DriverManagerHelper.sleep(2);
 			Map<String, String> rowData = dataIterations.get(i);

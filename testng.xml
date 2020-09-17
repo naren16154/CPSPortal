@@ -13,7 +13,6 @@
 			</run>
 		</groups>
 		<classes>
-			<class name="com.agilent.cps.tests.tests" />
 			<class name="com.agilent.cps.author.AuthorTests" />
 		</classes>
 	</test>
