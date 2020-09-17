@@ -1,5 +1,7 @@
 package com.agilent.cps.widgetactions;
 
+import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -30,8 +32,12 @@ public class ComboBox extends GUIWidget implements IGUIWidget {
 
 	@Override
 	public String getDisplayValue() {
-		WebElement element = managerHelper.getWebElement(widgetInfo);
-		return element.getText().trim();
+		List<WebElement> elements = managerHelper.getWebElements(widgetInfo);
+		for(WebElement element : elements) {
+			if(element.getTagName().equals("input"))
+				return element.getAttribute("value").trim();
+		}
+		return null;
 	}
 
 }

@@ -1,6 +1,7 @@
 package com.agilent.cps.components;
 
 import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,7 +27,7 @@ public abstract class BaseComponent {
 		AutoPopulator.populate(this, rowData);
 	}
 	
-	public abstract void verifyPreview(Map<String, String> rowData);
+	public abstract void verifyPreview(Map<String, String> rowData) throws ParseException;
 	
 	public abstract String getComponentName();
 	
@@ -74,6 +75,46 @@ public abstract class BaseComponent {
 			Verify.verifyEquals("Verifying window title", newWindowTitle, driver.getTitle());
 			driver.navigate().back();
 		}
+	}
+	
+	public void verifyTextFontSize(String string, WebElement element, String fontStyle) {
+		String actualFontSize = element.getCssValue("font-size");
+		String expectedFontSize = null;
+		String actualTagName = "";
+		if(element.getTagName().equalsIgnoreCase("a"))
+			actualTagName = element.findElement(By.xpath("parent::*")).getTagName();
+		else
+			actualTagName = element.getTagName();
+		
+		
+		switch (fontStyle.toLowerCase()) {
+		case "h0":
+			expectedFontSize = "32px";
+			break;
+		case "h1":
+			expectedFontSize = "32px";
+			break;
+		case "h2":
+			expectedFontSize = "24px";
+			break;
+		case "h3":
+			expectedFontSize = "20.8px";
+			break;
+		case "h4":
+			expectedFontSize = "16px";
+			break;
+		case "h5":
+			expectedFontSize = "12.8px";
+			break;
+		case "h6":
+			expectedFontSize = "11.2px";
+			break;
+		default:
+			expectedFontSize = "NA";
+			break;
+		}
+		Verify.verifyEquals("Verifying headline link font size", expectedFontSize, actualFontSize);
+		Verify.verifyEquals("Verifying font tag name", "h0".equalsIgnoreCase(fontStyle.toLowerCase())?"div":fontStyle.toLowerCase(), actualTagName);
 	}
 	
 	public static List<Map<String, String>> getDataMap(String iterations)

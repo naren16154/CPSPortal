@@ -1,13 +1,14 @@
 package com.agilent.cps.components;
 
 import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.assertj.core.util.Arrays;
 import org.openqa.selenium.By;
@@ -23,7 +24,9 @@ import com.agilent.cps.widgetactions.CheckBox;
 import com.agilent.cps.widgetactions.ComboBox;
 import com.agilent.cps.widgetactions.DropDown;
 import com.agilent.cps.widgetactions.GUIWidget;
+import com.agilent.cps.widgetactions.Label;
 import com.agilent.cps.widgetactions.Link;
+import com.agilent.cps.widgetactions.ListBox;
 import com.agilent.cps.widgetactions.RTE;
 import com.agilent.cps.widgetactions.RadioGroup;
 import com.agilent.cps.widgetactions.TextField;
@@ -40,6 +43,7 @@ public class PEPList extends BaseComponent {
 		public static final WidgetInfo gridOption = new WidgetInfo("name=./gridoption", RadioGroup.class);
 		public static final WidgetInfo showBrandLines = new WidgetInfo("name=./showBrandLines", CheckBox.class);
 		public static final WidgetInfo listSettingsTab = new WidgetInfo("xpath=//coral-tab/coral-tab-label[text()='List Settings']", GUIWidget.class);
+		public static final WidgetInfo webinarTab = new WidgetInfo("xpath=//coral-tab/coral-tab-label[text()='Webinar']", GUIWidget.class);
 		public static final WidgetInfo buildList = new WidgetInfo("name=./listFrom", DropDown.class);
 		public static final WidgetInfo showFilters = new WidgetInfo("name=./filter", CheckBox.class);
 		
@@ -48,30 +52,45 @@ public class PEPList extends BaseComponent {
 		public static final WidgetInfo childDeapth = new WidgetInfo("name=./childDepth", TextField.class);
 		public static final WidgetInfo orderByPublishDate = new WidgetInfo("name=./orderby", CheckBox.class);
 		public static final WidgetInfo hideImage = new WidgetInfo("name=./hideimage", CheckBox.class);
-		public static final WidgetInfo hidePEPDescription = new WidgetInfo("name=./hidedescription", CheckBox.class);
-		public static final WidgetInfo hideCategoryTags = new WidgetInfo("name=./hidecategorytags", CheckBox.class);
+		public static final WidgetInfo hideDescription = new WidgetInfo("name=./hidedescription", CheckBox.class);
+		public static final WidgetInfo hideTags = new WidgetInfo("name=./hidecategorytags", CheckBox.class);
 		public static final WidgetInfo hideEventDate = new WidgetInfo("name=./hideeventdate", CheckBox.class);
 		public static final WidgetInfo hideEventPresenter = new WidgetInfo("name=./hideeventpresenter", CheckBox.class);
 		
 //		Fixed List Options
 		public static final WidgetInfo addButton = new WidgetInfo("xpath=//button/coral-button-label[text()='Add']", Button.class);
 		public static final WidgetInfo page = new WidgetInfo("name=./fixedlist/item%s/./pages", ComboBox.class);
-		public static final WidgetInfo hidePEPImage = new WidgetInfo("name=./fixedlist/item%s/./hideimage", CheckBox.class);
+		public static final WidgetInfo hideImageFixed = new WidgetInfo("name=./fixedlist/item%s/./hideimage", CheckBox.class);
 		public static final WidgetInfo image = new WidgetInfo("name=./fixedlist/item%s/./images", ComboBox.class);
-		public static final WidgetInfo hidePEPDescriptionFixed = new WidgetInfo("name=./fixedlist/item%s/./hidedescription", CheckBox.class);
+		public static final WidgetInfo hideDescriptionFixed = new WidgetInfo("name=./fixedlist/item%s/./hidedescription", CheckBox.class);
 		public static final WidgetInfo description = new WidgetInfo("name=./fixedlist/item%s/./description", RTE.class);
-		public static final WidgetInfo hidePEPTags = new WidgetInfo("name=./fixedlist/item%s/./hidecategorytags", CheckBox.class);
+		public static final WidgetInfo hideTagsFixed = new WidgetInfo("name=./fixedlist/item%s/./hidecategorytags", CheckBox.class);
 		public static final WidgetInfo tags = new WidgetInfo("name=./fixedlist/item%s/./cattag", ComboBox.class);
 		public static final WidgetInfo featureFlag = new WidgetInfo("name=./fixedlist/item%s/./flag", CheckBox.class);
 		public static final WidgetInfo buttonText = new WidgetInfo("name=./fixedlist/item%s/./ctatext", TextField.class);
 		public static final WidgetInfo buttonLink = new WidgetInfo("name=./fixedlist/item%s/./ctalink", TextField.class);
 		public static final WidgetInfo buttonLinkAction = new WidgetInfo("name=./fixedlist/item%s/./ctalinkaction", DropDown.class);
 		public static final WidgetInfo buttonIconPosition = new WidgetInfo("name=./fixedlist/item%s/./ctaposition", DropDown.class);
-		public static final WidgetInfo showWebinarProps = new WidgetInfo("name=./fixedlist/item%s/./webcheck", CheckBox.class);
-		public static final WidgetInfo headlineText = new WidgetInfo("name=./fixedlist/item%s/./headlineText", TextField.class);
-		public static final WidgetInfo eventDate = new WidgetInfo("xpath=//coral-datepicker[@name='./fixedlist/item0/./eventDate']//input", TextField.class);
-		public static final WidgetInfo eventPresenterName = new WidgetInfo("name=./fixedlist/item0/./eventPresenterName", TextField.class);
-		public static final WidgetInfo eventPresenterTitle = new WidgetInfo("name=./fixedlist/item0/./eventPresenterTitle", TextField.class);
+		
+//		Webinar Page
+		public static final WidgetInfo webinarAddButton = new WidgetInfo("xpath=//coral-multifield[@data-granite-coral-multifield-name='./webinarList']/button/coral-button-label[text()='Add']", Button.class);
+		public static final WidgetInfo webinarPageSource = new WidgetInfo("name=./webinarList/item%s/./webPageSource", ComboBox.class);
+		public static final WidgetInfo webinarHeadline = new WidgetInfo("name=./webinarList/item%s/./webHeadlineText", TextField.class);
+		public static final WidgetInfo webinarHideTextArea = new WidgetInfo("name=./webinarList/item%s/./webHideTextArea", CheckBox.class);
+		public static final WidgetInfo webinarTextArea = new WidgetInfo("name=./webinarList/item%s/./webTextArea", RTE.class);
+		public static final WidgetInfo webinarHideTags = new WidgetInfo("name=./webinarList/item%s/./webHideContentTags", CheckBox.class);
+		public static final WidgetInfo webinarTags = new WidgetInfo("name=./webinarList/item%s/./webContentTag", ComboBox.class);
+		public static final WidgetInfo eventDate = new WidgetInfo("xpath=//coral-datepicker[@name='./webinarList/item%s/./webEventDate']/input", TextField.class);
+		public static final WidgetInfo eventPresenterName = new WidgetInfo("name=./webinarList/item%s/./webEventPresenterName", TextField.class);
+		public static final WidgetInfo eventPresenterTitle = new WidgetInfo("name=./webinarList/item%s/./webEventPresenterTitle", TextField.class);
+		public static final WidgetInfo eventPresenterHeadshot = new WidgetInfo("name=./webinarList/item%s/./webEventPresenterHeadshot", ComboBox.class);
+		
+		public static final WidgetInfo ctaAddButton = new WidgetInfo("xpath=//label[text()='Button CTA']/..//button/coral-button-label[text()='Add']", Button.class);
+		public static final WidgetInfo webinarButtonText = new WidgetInfo("name=./webinarList/item%s/./buttonCta/item%s/./buttonText", TextField.class);
+		public static final WidgetInfo webinarButtonLink = new WidgetInfo("name=./webinarList/item%s/./buttonCta/item%s/./buttonSource", TextField.class);
+		public static final WidgetInfo linkActions = new WidgetInfo("name=./webinarList/item%s/./buttonCta/item%s/./buttonSource", ListBox.class);
+		public static final WidgetInfo buttonColor = new WidgetInfo("name=./webinarList/item%s/./buttonCta/item%s/./buttonColor", ListBox.class);
+		public static final WidgetInfo webinarFilters = new WidgetInfo("name=./filterWebinar", CheckBox.class);
 		
 	}
 	
@@ -87,6 +106,20 @@ public class PEPList extends BaseComponent {
 		}
 	}
 	
+	public void AddWebinars(String data) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		DM.GUIWidget(Widgets.webinarTab).click();
+		DriverManagerHelper.sleep(1);
+		List<Map<String, String>> iterationsData = getDataMap(data);
+		int iteration = 0;
+		for(Map<String, String> rowdata : iterationsData) {
+			DM.button(Widgets.webinarAddButton).click();
+			DriverManagerHelper.sleep(1);
+			AutoPopulator.populate(this, rowdata, iteration+"");
+			DriverManagerHelper.sleep(1);
+			iteration++;
+		}
+	}
+	
 	public void AddChildPages(String data) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		List<Map<String, String>> iterationsData = getDataMap(data);
 		int iteration = 0;
@@ -94,8 +127,22 @@ public class PEPList extends BaseComponent {
 			AutoPopulator.populate(this, rowdata, iteration+"");
 	}
 	
+	public void addCTAButtons (String data) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		List<Map<String, String>> iterationsData = getDataMap(data);
+		int webinarCardNumber = DMHelper.getWebElements(new WidgetInfo("xpath=//label[text()='Headline Text']", Label.class)).size();
+		int iteration = 0;
+		for(Map<String, String> rowdata : iterationsData) {
+			List<WebElement> ctaAddButtons = DMHelper.getWebElements(Widgets.ctaAddButton);
+			ctaAddButtons.get(ctaAddButtons.size()-1).click();
+			DriverManagerHelper.sleep(1);
+			AutoPopulator.populate(this, rowdata, webinarCardNumber-1+"" , iteration+"");
+			DriverManagerHelper.sleep(1);
+			iteration++;
+		}
+	}
+	
 	@Override
-	public void verifyPreview(Map<String, String> rowData) {
+	public void verifyPreview(Map<String, String> rowData) throws ParseException {
 		String buildList = rowData.getOrDefault("buildList", "Child pages");
 		String layoutType = rowData.get("layoutType"); 
 		String publishPage = DM.getCurrentWebDriver().getWindowHandle();
@@ -105,9 +152,17 @@ public class PEPList extends BaseComponent {
 			Map<String, String> listSettings = getDataMap(rowData.get("AddChildPages")).get(0);
 			propertiesData.putAll(getChildpagesProperties(listSettings.get("parentPage"), layoutType));
 		}else {
-			List<Map<String, String>> iterationsData = getDataMap(rowData.get("AddFixedList"));
+			List<Map<String, String>> iterationsData = new ArrayList<Map<String,String>>();
+			String columnName;
+			if(layoutType.contains("Webinar")) {
+				iterationsData = getDataMap(rowData.get("AddWebinars"));
+				columnName = "webinarPageSource";
+			}else {
+				iterationsData = getDataMap(rowData.get("AddFixedList"));
+				columnName = "page";
+			}
 			for(Map<String, String> singlePageData : iterationsData)
-				propertiesData.putAll(getPageProperties(singlePageData.get("page"), layoutType));
+				propertiesData.putAll(getPageProperties(singlePageData.get(columnName), layoutType));
 		}
 		System.out.println(propertiesData);
 		
@@ -117,14 +172,14 @@ public class PEPList extends BaseComponent {
 		
 	}
 
-	private void verifyAllCardsProperties(String layoutType, String buildList, Map<String, String> rowData, Map<String, Map<String, String>> propertiesData) {
+	private void verifyAllCardsProperties(String layoutType, String buildList, Map<String, String> rowData, Map<String, Map<String, String>> propertiesData) throws ParseException {
 		int expectedCardsCount = propertiesData.size();
 		int actualCardsCount = 0;
 		WebDriver driver = DM.getCurrentWebDriver();
 		
-		List<Map<String, String>> overrideCardsData = "Child pages".equalsIgnoreCase(buildList)?getDataMap(rowData.get("AddChildPages")):getDataMap(rowData.get("AddFixedList"));
+		List<Map<String, String>> overrideCardsData = "Child pages".equalsIgnoreCase(buildList)?getDataMap(rowData.get("AddChildPages")):(layoutType.contains("Webinar")?getDataMap(rowData.get("AddWebinars")):getDataMap(rowData.get("AddFixedList")));
 		
-		List<WebElement> cards = driver.findElements(By.xpath("//div[contains(@class,'cards-container')]/div[@class='col left']/div"));
+		List<WebElement> cards = driver.findElements(By.xpath("//div[contains(@class,'cards-container')]//div[@class='mdc-card card-component']"));
 		for(int i=0; i< cards.size(); i++) {
 			Map<String, String> overrideCardData = "Child pages".equalsIgnoreCase(buildList)?overrideCardsData.get(0):overrideCardsData.get(actualCardsCount);
 			verifyCardProperties(cards.get(i), layoutType, buildList, overrideCardData, propertiesData, actualCardsCount, false);
@@ -132,7 +187,7 @@ public class PEPList extends BaseComponent {
 				verifyPresenceOfBrandBar(cards.get(i), rowData.getOrDefault("showBrandLines", "uncheck"));
 			verifyCTAButtonsFunctionality(cards.get(i), layoutType, buildList, overrideCardData, false);
 			actualCardsCount++;
-			cards = driver.findElements(By.xpath("//div[contains(@class,'cards-container')]/div[@class='col left']/div"));
+			cards = driver.findElements(By.xpath("//div[contains(@class,'cards-container')]//div[@class='mdc-card card-component']"));
 		}
 		
 		if("Featured Card".equalsIgnoreCase(layoutType)) {
@@ -145,12 +200,22 @@ public class PEPList extends BaseComponent {
 				actualCardsCount++;
 			}
 		}
-		if(!"Featured Card".equalsIgnoreCase(layoutType))
-			verifyFilterFunctionality(propertiesData, rowData);
+		if(!"Featured Card".equalsIgnoreCase(layoutType)) {
+			String showFilters;
+			if(layoutType.contains("Webinar"))
+				showFilters = rowData.getOrDefault("webinarFilters", "uncheck");
+			else
+				showFilters = rowData.getOrDefault("showFilters", "uncheck");
+			if("check".equalsIgnoreCase(showFilters))
+				verifyFilterFunctionality(propertiesData, layoutType);
+			else
+				Verify.verifyEquals("Filters section should not display", DM.widgetNotExists(new WidgetInfo("xpath=//div[contains(@id,'mdc-chip')]", GUIWidget.class), 1, .5));
+			
+		}
 		Verify.verifyEquals("Total Cards Count", expectedCardsCount+"", actualCardsCount+"");
 	}
 
-	private void verifyFilterFunctionality(Map<String, Map<String, String>> propertiesData, Map<String, String> rowData) {
+	private void verifyFilterFunctionality(Map<String, Map<String, String>> propertiesData, String layoutType) {
 		WebDriver driver = DM.getCurrentWebDriver();
 		Set<String> expectedTagsList = new HashSet<String>();
 		Set<String> actualTagsList = new HashSet<String>();
@@ -162,7 +227,10 @@ public class PEPList extends BaseComponent {
 			String[] tags = propertiesData.get(cardTitle).get("tags").split(",");
 			for(String tag : tags)
 				expectedTagsList.add(tag);
-			cardTagsMap.put(cardTitle, Arrays.asList(tags));
+			if(layoutType.contains("Webinar"))
+				cardTagsMap.put(propertiesData.get(cardTitle).get("headline"), Arrays.asList(tags));
+			else
+				cardTagsMap.put(propertiesData.get(cardTitle).get("pageTitle"), Arrays.asList(tags));
 		}
 		
 		List<WebElement> filters = driver.findElements(By.xpath("//div[contains(@id,'mdc-chip')]"));
@@ -194,7 +262,7 @@ public class PEPList extends BaseComponent {
 		Set<String> expectedCards = new HashSet<String>();
 		Set<String> actualCards = new HashSet<String>();
 		
-		List<WebElement> cards = DM.getCurrentWebDriver().findElements(By.xpath("//div[contains(@class,'cards-container')]/div[@class='col left']/div"));
+		List<WebElement> cards = DM.getCurrentWebDriver().findElements(By.xpath("//div[contains(@class,'cards-container')]//div[@class='mdc-card card-component']/.."));
 		for(WebElement card : cards) {
 			if(!card.getCssValue("display").equalsIgnoreCase("none")) {
 				String cardTitle = card.findElement(By.className("card__title")).getText();
@@ -264,22 +332,28 @@ public class PEPList extends BaseComponent {
 	private void verifyCTAButtonsFunctionality(WebElement cardElement, String layoutType, String buildList, Map<String, String> overrideCardData, boolean isFeatured) {
 		WebDriver driver = DM.getCurrentWebDriver();
 		String title = "";
-		if("Featured Card".equalsIgnoreCase(layoutType) && !isFeatured)
-			title = cardElement.findElement(By.className("card__supporting-text")).getText();
-		else
-			title = cardElement.findElement(By.className("card__title")).getText();
 		if("Child pages".equalsIgnoreCase(buildList)) {
+			if("Featured Card".equalsIgnoreCase(layoutType) && !isFeatured)
+				title = cardElement.findElement(By.className("card__supporting-text")).getText();
+			else
+				title = cardElement.findElement(By.className("card__title")).getText();
 			cardElement.findElement(By.linkText("View More")).click();
 			Verify.verifyEquals("Button Link Title", title, driver.getTitle());
 			driver.navigate().back();
 		}else {
-			if(overrideCardData.containsKey("buttonLink"))
+			if(layoutType.contains("Webinar")) {
+				List<Map<String, String>> iterationsData = new ArrayList<Map<String,String>>();
+				if(overrideCardData.containsKey("addCTAButtons"))
+					iterationsData = getDataMap(overrideCardData.get("addCTAButtons"));
+				for(Map<String, String> rowData : iterationsData)
+					verifyLinkOrbutton(cardElement.findElement(By.linkText(rowData.get("webinarButtonText"))), rowData.get("linkActions"), rowData.get("webinarButtonLink"), title);
+			}else if(overrideCardData.containsKey("buttonLink"))
 				verifyLinkOrbutton(cardElement.findElement(By.linkText(overrideCardData.get("buttonText"))), overrideCardData.get("buttonLinkAction"), overrideCardData.get("buttonLink"), title);
 		}
 	}
 
 	private void verifyPresenceOfBrandBar(WebElement card, String brandBar) {
-		List<WebElement> brandBarElements = card.findElements(By.className("brand-lines"));
+		List<WebElement> brandBarElements = card.findElements(By.xpath("parent::div/div[contains(@class,'brand-lines')]"));
 		if("check".equalsIgnoreCase(brandBar)) {
 			if(brandBarElements.size()==0)
 				Verify.verifyEquals("Brandbar should display", false);
@@ -294,20 +368,34 @@ public class PEPList extends BaseComponent {
 	}
 
 	private void verifyCardProperties(WebElement card, String layoutType, String buildList, Map<String, String> overrideCardData,
-			Map<String, Map<String, String>> propertiesData, int cardIndex, boolean isFeaturedCard) {
+			Map<String, Map<String, String>> propertiesData, int cardIndex, boolean isFeaturedCard) throws ParseException {
 		
-		Boolean hideImage = "check".equalsIgnoreCase(overrideCardData.getOrDefault("hideImage", "uncheck"))?true:false;
-		Boolean hideDescription = "check".equalsIgnoreCase(overrideCardData.getOrDefault("hideDescription", "uncheck"))?true:false;
-		Boolean hideTags = "check".equalsIgnoreCase(overrideCardData.getOrDefault("hideTags", "uncheck"))?true:false;
+		Boolean hideImage = false;
+		Boolean hideDescription = false;
+		Boolean hideTags = false;
 		
 		String overrideImage = "";
 		String overrideDescription = "";
 		String overrideTags = "";
 		
 		if("Fixed list".equalsIgnoreCase(buildList)) {
-			overrideImage = overrideCardData.getOrDefault("image", "");
-			overrideDescription = overrideCardData.getOrDefault("description", "");
-			overrideTags = overrideCardData.getOrDefault("tags", "");
+			if(layoutType.contains("Webinar")) {
+				hideDescription = "check".equalsIgnoreCase(overrideCardData.getOrDefault("webinarHideTextArea", "uncheck"))?true:false;
+				hideTags = "check".equalsIgnoreCase(overrideCardData.getOrDefault("webinarHideTags", "uncheck"))?true:false;
+				overrideDescription = overrideCardData.getOrDefault("webinarTextArea", "");
+				overrideTags = overrideCardData.getOrDefault("webinarTags", "");
+			}else {
+				hideImage = "check".equalsIgnoreCase(overrideCardData.getOrDefault("hideImageFixed", "uncheck"))?true:false;
+				hideDescription = "check".equalsIgnoreCase(overrideCardData.getOrDefault("hideDescriptionFixed", "uncheck"))?true:false;
+				hideTags = "check".equalsIgnoreCase(overrideCardData.getOrDefault("hideTagsFixed", "uncheck"))?true:false;
+				overrideImage = overrideCardData.getOrDefault("image", "");
+				overrideDescription = overrideCardData.getOrDefault("description", "");
+				overrideTags = overrideCardData.getOrDefault("tags", "");
+			}
+		}else {
+			hideImage = "check".equalsIgnoreCase(overrideCardData.getOrDefault("hideImage", "uncheck"))?true:false;
+			hideDescription = "check".equalsIgnoreCase(overrideCardData.getOrDefault("hideDescription", "uncheck"))?true:false;
+			hideTags = "check".equalsIgnoreCase(overrideCardData.getOrDefault("hideTags", "uncheck"))?true:false;
 		}
 		
 		Map<String, String> actualCardDetails = new HashMap<String, String>();
@@ -316,13 +404,21 @@ public class PEPList extends BaseComponent {
 		if(isFeaturedCard)
 			cardXpathText = "//div[contains(@class,'cards-container')]/div[@class='col right']/div[1]";
 		else
-			cardXpathText = "//div[contains(@class,'cards-container')]/div[@class='col left']/div["+(cardIndex+1)+"]";
+			cardXpathText = "(//div[contains(@class,'cards-container')]//div[@class='mdc-card card-component'])["+(cardIndex+1)+"]";
 		
 		WidgetInfo image = new WidgetInfo("xpath="+cardXpathText+"//img", GUIWidget.class);
 		WidgetInfo pageTitle = new WidgetInfo("xpath="+cardXpathText+"//div[@class='card__title']", GUIWidget.class);
 		WidgetInfo description = new WidgetInfo("xpath="+cardXpathText+"//div[@class='card__supporting-text']", GUIWidget.class);
-		WidgetInfo tags = new WidgetInfo("xpath="+cardXpathText+"//div[@class='tag']", GUIWidget.class);
+		WidgetInfo tags = new WidgetInfo("xpath="+cardXpathText+"//div[starts-with(@class,'tag')]", GUIWidget.class);
 		WidgetInfo overlayText = new WidgetInfo("xpath="+cardXpathText+"//div[@class='category-label']", GUIWidget.class);
+		WidgetInfo eventDate = new WidgetInfo("xpath="+cardXpathText+"//div[@class='date']", GUIWidget.class);
+		WidgetInfo eventPresenterName = new WidgetInfo("xpath="+cardXpathText+"//div[@class='author']", GUIWidget.class);
+		WidgetInfo eventPresenterNameArchive = new WidgetInfo("xpath="+cardXpathText+"//div[@class='auther']", GUIWidget.class);
+		WidgetInfo eventPresenterHeadshot = new WidgetInfo("xpath="+cardXpathText+"//img", GUIWidget.class);
+		WidgetInfo eventPresenterTitle = new WidgetInfo("xpath="+cardXpathText+"//figcaption", GUIWidget.class);
+		
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat dfactual = new SimpleDateFormat("dd MMM yyyy");
 		
 		switch (layoutType) {
 			case "Grid Text":
@@ -357,6 +453,28 @@ public class PEPList extends BaseComponent {
 					actualCardDetails.put("tags", DM.GUIWidget(tags).getDisplayValue().replaceAll("\n", ","));
 				break;
 				
+			case "Webinar Card 1 Column":
+				actualCardDetails.put("headline", DM.GUIWidget(pageTitle).getDisplayValue());
+				actualCardDetails.put("eventDate", df.format(dfactual.parse(DM.GUIWidget(eventDate).getDisplayValue().substring(6))));
+				actualCardDetails.put("eventPresenterName", DM.GUIWidget(eventPresenterName).getDisplayValue().substring(11));
+				actualCardDetails.put("eventPresenterTitle", DM.GUIWidget(eventPresenterTitle).getDisplayValue());
+				actualCardDetails.put("eventPresenterHeadshot", DM.GUIWidget(eventPresenterHeadshot).getAttribute("src"));
+				if(hideDescription)
+					Verify.verifyEquals("Description should not visible", !DM.widgetVisible(description, 1, .5));
+				else
+					actualCardDetails.put("description", DM.GUIWidget(description).getDisplayValue());
+				if(hideTags)
+					Verify.verifyEquals("Tags should not visible", !DM.widgetVisible(tags, 1, .5));
+				else
+					actualCardDetails.put("tags", DM.GUIWidget(tags).getDisplayValue().replaceAll("\n", ","));
+				break;
+				
+			case "Webinar Archive":
+				actualCardDetails.put("headline", DM.GUIWidget(pageTitle).getDisplayValue());
+				actualCardDetails.put("eventDate", df.format(dfactual.parse(DM.GUIWidget(eventDate).getDisplayValue().substring(6))));
+				actualCardDetails.put("eventPresenterName", DM.GUIWidget(eventPresenterNameArchive).getDisplayValue().substring(11));
+				break;
+				
 			default:
 				if(isFeaturedCard) {
 					actualCardDetails.put("pageTitle", DM.GUIWidget(pageTitle).getDisplayValue());
@@ -380,7 +498,7 @@ public class PEPList extends BaseComponent {
 				break;
 		}
 		
-		Map<String, String> cardProperties = propertiesData.get(actualCardDetails.get("pageTitle"));
+		Map<String, String> cardProperties = getCardProperties(propertiesData, actualCardDetails, layoutType);
 		
 		for(String attribute : actualCardDetails.keySet()){
 			switch (attribute) {
@@ -408,6 +526,20 @@ public class PEPList extends BaseComponent {
 			}
 		}
 		
+	}
+
+	private Map<String, String> getCardProperties(Map<String, Map<String, String>> propertiesData, Map<String, String> actualCardDetails, String layoutType) {
+		Map<String, String> cardProperties = new HashMap<String, String>();
+		String keyName = "pageTitle";
+		if(layoutType.contains("Webinar"))
+			keyName = "headline";
+			
+		for(String title : propertiesData.keySet()) {
+			cardProperties = propertiesData.get(title);
+			if(cardProperties.get(keyName).equalsIgnoreCase(actualCardDetails.get(keyName)))
+				break;
+		}
+		return cardProperties;
 	}
 
 	private Map<String, Map<String, String>> getPageProperties(String page, String layoutType) {
@@ -444,6 +576,7 @@ public class PEPList extends BaseComponent {
 		Map<String, String> propertiesMap = new HashMap<String, String>();
 		WidgetInfo title = new WidgetInfo("name=./jcr:title", TextField.class);
 		WidgetInfo pageTitle = new WidgetInfo("name=./pageTitle", TextField.class);
+		
 		WidgetInfo pepPropertiesLink = new WidgetInfo("xpath=//coral-tab/coral-tab-label[text()='PEP Properties']", Link.class);
 		WidgetInfo pepImage = new WidgetInfo("name=./imagePath", TextField.class);
 		WidgetInfo description = new WidgetInfo("name=./text", TextField.class);
@@ -451,15 +584,19 @@ public class PEPList extends BaseComponent {
 		WidgetInfo featuresFlag = new WidgetInfo("xpath=//input[@name='./featuredflag']", CheckBox.class);
 		WidgetInfo mediaType = new WidgetInfo("name=./mediaType", DropDown.class);
 		
-		String pageTitleText = DM.textField(pageTitle).getDisplayValue();
-		propertiesMap.put("title", DM.textField(title).getDisplayValue());
-		propertiesMap.put("pageTitle", pageTitleText);
-		DM.link(pepPropertiesLink).click();
-		propertiesMap.put("image", DM.textField(pepImage).getDisplayValue());
-		propertiesMap.put("description", DM.textField(description).getDisplayValue().replaceAll("(<.*?>)", ""));
-		propertiesMap.put("featuredFlag", DM.checkBox(featuresFlag).getDisplayValue());
-		propertiesMap.put("mediaType", DM.dropDown(mediaType).getDisplayValue());
+		WidgetInfo webinarPropertiesLink = new WidgetInfo("xpath=//coral-tab/coral-tab-label[text()='Webinar Properties']", Link.class);
+		WidgetInfo headline = new WidgetInfo("name=./headlineText", TextField.class);
+		WidgetInfo eventDate = new WidgetInfo("xpath=//coral-datepicker[@name='./eventDate']/input", TextField.class);
+		WidgetInfo eventPresenterName = new WidgetInfo("name=./eventPresenterName", TextField.class);
+		WidgetInfo eventPresenterTitle = new WidgetInfo("name=./eventPresenterTitle", TextField.class);
+		WidgetInfo eventPresenterHeadshot = new WidgetInfo("name=./eventPresenterHeadshot", ComboBox.class);
 		
+		
+		String titleText = DM.textField(title).getDisplayValue();
+		propertiesMap.put("pageTitle", DM.textField(pageTitle).getDisplayValue());
+		DM.link(pepPropertiesLink).click();
+		propertiesMap.put("description", DM.textField(description).getDisplayValue().replaceAll("(<.*?>)", ""));
+		propertiesMap.put("mediaType", DM.dropDown(mediaType).getDisplayValue());
 		//Read Tags
 		List<WebElement> tagElements = DMHelper.getWebElement(tags).findElements(By.tagName("coral-tag-label"));
 		String tagsList = "";
@@ -475,7 +612,19 @@ public class PEPList extends BaseComponent {
 		if("Featured Card".equalsIgnoreCase(layoutType))
 			propertiesMap.put("tags", tagsList.substring(1).split(",")[0].toUpperCase());
 		
-		propertiesData.put(pageTitleText, propertiesMap);
+		if(layoutType.contains("Webinar")) {
+			DM.link(webinarPropertiesLink).click();
+			propertiesMap.put("headline", DM.textField(headline).getDisplayValue());
+			propertiesMap.put("eventDate", DM.textField(eventDate).getDisplayValue());
+			propertiesMap.put("eventPresenterName", DM.textField(eventPresenterName).getDisplayValue());
+			propertiesMap.put("eventPresenterTitle", DM.textField(eventPresenterTitle).getDisplayValue());
+			propertiesMap.put("eventPresenterHeadshot", DM.comboBox(eventPresenterHeadshot).getDisplayValue());
+		}else {
+			propertiesMap.put("image", DM.textField(pepImage).getDisplayValue());
+			propertiesMap.put("featuredFlag", DM.checkBox(featuresFlag).getDisplayValue());
+		}
+		
+		propertiesData.put(titleText, propertiesMap);
 		
 		DM.link(new WidgetInfo("linktext=Cancel", Link.class)).click();
 		
@@ -483,12 +632,12 @@ public class PEPList extends BaseComponent {
 	}
 	
 	private void navigateToPage(String[] path) {
+		DriverManagerHelper.sleep(1);
 		for(int i=2; i<path.length; i++) {
 			List<WebElement> elements = DM.getCurrentWebDriver().findElements(By.xpath("//div[contains(text(),'"+path[i]+"')]"));
 			elements.get(elements.size()-1).click();
 			DriverManagerHelper.sleep(1);
 		}
-		
 	}
 
 	@Override
@@ -497,19 +646,16 @@ public class PEPList extends BaseComponent {
 	}
 	
 	public static void main(String[] args) {
-		/*
-		 * String text =
-		 * "<li>Understand the core principles of PD-L1 pathology·        </li>";
-		 * System.out.println(text.replaceAll("[(<[p(li)(ul))]>)][(</[p(li)(ul)]>)]",
-		 * "")); System.out.println(text.replaceAll("(<.*?>)", ""));
-		 */
-//		System.out.println(String.valueOf(false));
-		String expectedValue = "false";
-		String actualValue = "false";
-		Pattern pattern = Pattern.compile(expectedValue, Pattern.LITERAL);
-		Matcher matcher = pattern.matcher(actualValue);
-		boolean matchFound = matcher.matches();
-		System.out.println(matchFound);
+		
+		  String text ="<p>PD-L1 is a critical biomarker for the only FDA-approved anti-PD-1 monotherapy to treat gastric or gastroesophageal junction (GEJ) adenocarcinoma patients. Review how to evaluate and score PD-L1 expression using PD-L1 IHC 22C3 pharmDx and the new Combined Positive Score (CPS).</p>\r\n" + 
+		  		"<p>The Dako PD-L1 IHC 22C3 pharmDx Interpretation Training Program uses in-depth content, engaging activities, and comprehensive cases to help you confidently.</p>\r\n" + 
+		  		"<ul>\r\n" + 
+		  		"<li>Understand the core principles of PD-L1 pathology·        </li>\r\n" + 
+		  		"<li>Learn the process for evaluating stained images for PD-L1 expression</li>\r\n" + 
+		  		"<li>Recognize confounding considerations that affect PD-L1 interpretation</li>\r\n" + 
+		  		"<li>Score images for PD-L1 expression across a variety of patient samples</li>\r\n" + 
+		  		"</ul>";
+		  System.out.println(text.replaceAll("(<.*?>)",""));
 	}
 
 }
