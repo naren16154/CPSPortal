@@ -334,7 +334,15 @@ public class PEPList extends BaseComponent {
 	private void verifyCTAButtonsFunctionality(WebElement cardElement, String layoutType, String buildList, Map<String, String> overrideCardData, boolean isFeatured) {
 		WebDriver driver = DM.getCurrentWebDriver();
 		String title = "";
-		if("Child pages".equalsIgnoreCase(buildList)) {
+		
+		if("Video Playlist".equalsIgnoreCase(layoutType)) {
+			title = cardElement.findElement(By.className("card__title")).getText();
+			WebElement link = cardElement.findElement(By.tagName("a"));
+			Verify.verifyEquals("Play button should display", link.findElements(By.className("fa-play-circle")).size()==1);
+			link.click();
+			Verify.verifyEquals("Screen Title", title, driver.getTitle());
+			driver.navigate().back();
+		}else if("Child pages".equalsIgnoreCase(buildList)) {
 			if("Featured Card".equalsIgnoreCase(layoutType) && !isFeatured)
 				title = cardElement.findElement(By.className("card__supporting-text")).getText();
 			else
@@ -482,6 +490,15 @@ public class PEPList extends BaseComponent {
 				actualCardDetails.put("eventDate", df.format(dfactual.parse(DM.GUIWidget(eventDate).getDisplayValue().substring(6))));
 				actualCardDetails.put("eventPresenterName", DM.GUIWidget(eventPresenterNameArchive).getDisplayValue().substring(11));
 				break;
+			
+			case "Video Playlist":
+				actualCardDetails.put("image", DM.GUIWidget(image).getAttribute("src"));
+				actualCardDetails.put("pageTitle", DM.GUIWidget(pageTitle).getDisplayValue());
+				if(hideDescription)
+					Verify.verifyEquals("Description should not visible", !DM.widgetVisible(description, 1, .5));
+				else
+					actualCardDetails.put("description", DM.GUIWidget(description).getDisplayValue());
+				break;
 				
 			default:
 				if(isFeaturedCard) {
@@ -616,7 +633,7 @@ public class PEPList extends BaseComponent {
 				tagsList += ","+tagName.split(":")[1].trim();
 		}
 		
-		propertiesMap.put("tags", tagsList.substring(1));
+		propertiesMap.put("tags", tagsList.length()>1?tagsList.substring(1):"");
 		if("Featured Card".equalsIgnoreCase(layoutType))
 			propertiesMap.put("tags", tagsList.substring(1).split(",")[0].toUpperCase());
 		
