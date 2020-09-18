@@ -10,6 +10,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -465,8 +467,14 @@ public class PEPList extends BaseComponent {
 					actualCardDetails.put("description", DM.GUIWidget(description).getDisplayValue());
 				if(hideTags)
 					Verify.verifyEquals("Tags should not visible", !DM.widgetVisible(tags, 1, .5));
-				else
-					actualCardDetails.put("tags", DM.GUIWidget(tags).getDisplayValue().replaceAll("\n", ","));
+				else {
+					WebElement tagElement = DMHelper.getWebElement(tags);
+					List<WebElement> spans = tagElement.findElements(By.tagName("span"));
+					String tagsList = "";
+					for(WebElement span : spans)
+						tagsList += ","+span.getText().trim();
+					actualCardDetails.put("tags", tagsList.substring(1));
+				}
 				break;
 				
 			case "Webinar Archive":
@@ -595,7 +603,7 @@ public class PEPList extends BaseComponent {
 		String titleText = DM.textField(title).getDisplayValue();
 		propertiesMap.put("pageTitle", DM.textField(pageTitle).getDisplayValue());
 		DM.link(pepPropertiesLink).click();
-		propertiesMap.put("description", DM.textField(description).getDisplayValue().replaceAll("(<.*?>)", ""));
+		propertiesMap.put("description", DM.textField(description).getDisplayValue().replaceAll("<ul>\n", "").replaceAll("(<.*?>)", "").trim());
 		propertiesMap.put("mediaType", DM.dropDown(mediaType).getDisplayValue());
 		//Read Tags
 		List<WebElement> tagElements = DMHelper.getWebElement(tags).findElements(By.tagName("coral-tag-label"));
@@ -643,19 +651,6 @@ public class PEPList extends BaseComponent {
 	@Override
 	public String getComponentName() {
 		return componentName;
-	}
-	
-	public static void main(String[] args) {
-		
-		  String text ="<p>PD-L1 is a critical biomarker for the only FDA-approved anti-PD-1 monotherapy to treat gastric or gastroesophageal junction (GEJ) adenocarcinoma patients. Review how to evaluate and score PD-L1 expression using PD-L1 IHC 22C3 pharmDx and the new Combined Positive Score (CPS).</p>\r\n" + 
-		  		"<p>The Dako PD-L1 IHC 22C3 pharmDx Interpretation Training Program uses in-depth content, engaging activities, and comprehensive cases to help you confidently.</p>\r\n" + 
-		  		"<ul>\r\n" + 
-		  		"<li>Understand the core principles of PD-L1 pathology·        </li>\r\n" + 
-		  		"<li>Learn the process for evaluating stained images for PD-L1 expression</li>\r\n" + 
-		  		"<li>Recognize confounding considerations that affect PD-L1 interpretation</li>\r\n" + 
-		  		"<li>Score images for PD-L1 expression across a variety of patient samples</li>\r\n" + 
-		  		"</ul>";
-		  System.out.println(text.replaceAll("(<.*?>)",""));
 	}
 
 }

@@ -30,7 +30,7 @@ public class Verify {
 	public static void verifyEquals(String expectedValue, String actualValue) {
 		logger.debug("Expected Value : "+expectedValue);
 		logger.debug("Actual Value : "+actualValue);
-		Pattern pattern = Pattern.compile(expectedValue);
+		Pattern pattern = Pattern.compile(expectedValue, Pattern.LITERAL);
 		Matcher matcher = pattern.matcher(actualValue);
 		boolean matchFound = matcher.matches();
 		logger.verificationPoint("result="+matchFound+" expected="+expectedValue+" actual="+actualValue, matchFound);
