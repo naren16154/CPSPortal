@@ -8,9 +8,7 @@ import org.openqa.selenium.interactions.Actions;
 
 import com.agilent.cps.core.AutoPopulator;
 import com.agilent.cps.core.DriverManagerHelper;
-import com.agilent.cps.core.Verify;
 import com.agilent.cps.widgetactions.Button;
-import com.agilent.cps.widgetactions.CheckBox;
 import com.agilent.cps.widgetactions.DropDown;
 import com.agilent.cps.widgetactions.GUIWidget;
 import com.agilent.cps.widgetactions.TextField;

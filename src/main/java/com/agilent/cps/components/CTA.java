@@ -40,19 +40,19 @@ public class CTA extends BaseComponent {
 		WebElement element = DMHelper.getWebElement(buttonLink);
 		String buttonColor = rowData.getOrDefault("buttonColor", "Blue/Solid");
 		if(buttonColor.equalsIgnoreCase("Transparent")) {
-			Verify.verifyEquals("Verifying button text color", "#0085d5", Color.fromString(element.getCssValue("color")).asHex());
-			Verify.verifyEquals("Verifying button BG color", "#000000", Color.fromString(element.getCssValue("background-color")).asHex());
+			verifyColor("Verifying button text color", "Blue", Color.fromString(element.getCssValue("color")).asHex());
+			verifyColor("Verifying button BG color", "DefaultColor", Color.fromString(element.getCssValue("background-color")).asHex());
 			Verify.verifyEquals("Verifying that button has border", element.getCssValue("border").contains("1px solid"));
 		}else if(buttonColor.equalsIgnoreCase("Text")) {
-			Verify.verifyEquals("Verifying button text color", "#0085d5", Color.fromString(element.getCssValue("color")).asHex());
-			Verify.verifyEquals("Verifying button BG color", "#000000", Color.fromString(element.getCssValue("background-color")).asHex());
+			verifyColor("Verifying button text color", "Blue", Color.fromString(element.getCssValue("color")).asHex());
+			verifyColor("Verifying button BG color", "DefaultColor", Color.fromString(element.getCssValue("background-color")).asHex());
 			Verify.verifyEquals("Verifying button does not has border", element.getCssValue("border").contains("0px none"));
 		}else {
-			Verify.verifyEquals("Verifying button text color", "#ffffff", Color.fromString(element.getCssValue("color")).asHex());
-			Verify.verifyEquals("Verifying button BG color", "#0085d5", Color.fromString(element.getCssValue("background-color")).asHex());
+			verifyColor("Verifying button text color", "White", Color.fromString(element.getCssValue("color")).asHex());
+			verifyColor("Verifying button BG color", "Blue", Color.fromString(element.getCssValue("background-color")).asHex());
 			Verify.verifyEquals("Verifying button does not has border", element.getCssValue("border").contains("0px none"));
 		}
-		verifyLinkOrbutton(element, rowData.getOrDefault("linkActions", "Existing window/tab"), rowData.get("buttonLink"), "Testing | Agilent");
+		verifyLinkOrbutton(element, rowData.getOrDefault("linkActions", "Existing window/tab"), rowData.get("buttonLink"), "AutomationTestingPage");
 	}
 	
 	@Override

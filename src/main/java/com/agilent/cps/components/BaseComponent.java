@@ -17,6 +17,23 @@ import com.agilent.cps.core.DriverManagerHelper;
 import com.agilent.cps.core.Verify;
 import com.agilent.cps.utils.ReadExcel;
 
+enum ColorCode{
+	black("#000000"),
+	blue("#0085d5"),
+	white("#ffffff"),
+	gray("#535557"),
+	defaultcolor("#000000");
+	
+	private String colorCode;
+	ColorCode(String color) {
+        this.colorCode = color;
+    }
+ 
+    public String getColorCode() {
+        return colorCode;
+    }
+}
+
 public abstract class BaseComponent {
 
 	DriverManager DM = DriverManager.getInstance();
@@ -39,7 +56,7 @@ public abstract class BaseComponent {
 		components.get(components.size()-1).click();
 		DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Styles']")).click();
 		
-		List<Object> actualStyles = Arrays.asList(styles.split(","));
+		List<String> actualStyles = Arrays.asList(styles.split(","));
 		
 		List<WebElement> stylesList = DM.getCurrentWebDriver().findElements(By.xpath("//form[@id='editor-styleselector-form']//coral-selectlist-item[@class='coral3-SelectList-item']"));
 		
@@ -67,14 +84,24 @@ public abstract class BaseComponent {
 			Verify.verifyEquals("Opening in same tab", windowsCountBefore+1+"", windows.size()+"");
 			for(String window : windows)
 				driver.switchTo().window(window);
-			Verify.verifyEquals("Verifying window title", newWindowTitle, driver.getTitle());
+			verifyWindowTitle("Verifying window title", newWindowTitle, driver.getTitle());
 			driver.close();
 			driver.switchTo().window(windowBefore);
 		}else {
 			Verify.verifyEquals("Opening in same tab", windowsCountBefore+"", windows.size()+"");
-			Verify.verifyEquals("Verifying window title", newWindowTitle, driver.getTitle());
+			verifyWindowTitle("Verifying window title", newWindowTitle, driver.getTitle());
 			driver.navigate().back();
 		}
+	}
+	
+	public void verifyColor(String message, String expectedColor, String actualColorCode) {
+		String expectedColorCode = ColorCode.valueOf(expectedColor.toLowerCase()).getColorCode();
+		Verify.verifyEquals(message, expectedColorCode, expectedColorCode);
+	}
+	
+	public void verifyWindowTitle(String message, String expectedTitle, String actualTitle) {
+		expectedTitle = actualTitle.endsWith(" | Agilent")?expectedTitle+" | Agilent":expectedTitle;
+		Verify.verifyEquals(message, expectedTitle, actualTitle);
 	}
 	
 	public void verifyTextFontSize(String string, WebElement element, String fontStyle) {
@@ -130,5 +157,5 @@ public abstract class BaseComponent {
 		else
 			return ReadExcel.workbookData.get(iterations);			
 	}
-
+	
 }

@@ -57,7 +57,7 @@ public class Hero extends BaseComponent {
 			WidgetInfo heroButton = new WidgetInfo("linktext="+rowData.get("buttonText"), Link.class);
 			Verify.verifyEquals("Verifying CTA Href", DM.GUIWidget(heroButton).getAttribute("href").contains(rowData.get("buttonLink")));
 			DM.GUIWidget(heroButton).click();
-			Verify.verifyEquals("Verifying window title", "Atlas of Stains", DM.getCurrentWebDriver().getTitle());
+			verifyWindowTitle("Verifying window title", "AutomationTestingPage", DM.getCurrentWebDriver().getTitle());
 			DMHelper.getWebDriver().navigate().back();
 		}
 		

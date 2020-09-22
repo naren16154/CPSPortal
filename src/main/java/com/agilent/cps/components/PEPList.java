@@ -10,8 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -221,7 +219,7 @@ public class PEPList extends BaseComponent {
 		WebDriver driver = DM.getCurrentWebDriver();
 		Set<String> expectedTagsList = new HashSet<String>();
 		Set<String> actualTagsList = new HashSet<String>();
-		Map<String, List<Object>> cardTagsMap = new HashMap<String, List<Object>>();
+		Map<String, List<String>> cardTagsMap = new HashMap<String, List<String>>();
 		
 		DM.getJSExecutor().executeScript("window.scrollTo(0,0);");
 		
@@ -260,7 +258,7 @@ public class PEPList extends BaseComponent {
 		
 	}
 
-	private void verifyCardsAfterFilterApplied(Set<String> selectedFilters, Map<String, List<Object>> cardTagsMap) {
+	private void verifyCardsAfterFilterApplied(Set<String> selectedFilters, Map<String, List<String>> cardTagsMap) {
 		Set<String> expectedCards = new HashSet<String>();
 		Set<String> actualCards = new HashSet<String>();
 		
@@ -275,7 +273,7 @@ public class PEPList extends BaseComponent {
 		}
 		
 		for(String cardTitle : cardTagsMap.keySet()) {
-			List<Object> tags = cardTagsMap.get(cardTitle);
+			List<String> tags = cardTagsMap.get(cardTitle);
 			for(String selectedFilter : selectedFilters) {
 				if(tags.contains(selectedFilter)) {
 					expectedCards.add(cardTitle);
@@ -340,7 +338,7 @@ public class PEPList extends BaseComponent {
 			WebElement link = cardElement.findElement(By.tagName("a"));
 			Verify.verifyEquals("Play button should display", link.findElements(By.className("fa-play-circle")).size()==1);
 			link.click();
-			Verify.verifyEquals("Screen Title", title, driver.getTitle());
+			verifyWindowTitle("Screen Title", title, driver.getTitle());
 			driver.navigate().back();
 		}else if("Child pages".equalsIgnoreCase(buildList)) {
 			if("Featured Card".equalsIgnoreCase(layoutType) && !isFeatured)
@@ -348,7 +346,7 @@ public class PEPList extends BaseComponent {
 			else
 				title = cardElement.findElement(By.className("card__title")).getText();
 			cardElement.findElement(By.linkText("View More")).click();
-			Verify.verifyEquals("Button Link Title", title, driver.getTitle());
+			verifyWindowTitle("Button Link Title", title, driver.getTitle());
 			driver.navigate().back();
 		}else {
 			if(layoutType.contains("Webinar")) {
@@ -529,19 +527,19 @@ public class PEPList extends BaseComponent {
 			switch (attribute) {
 			case "image":
 				if(hideImage & !"".equals(overrideImage))
-					Verify.verifyEquals("Verifying Card Content for "+attribute, cardProperties.get(attribute), overrideImage);
+					Verify.verifyEquals("Verifying Card Content for "+attribute, actualCardDetails.get(attribute).contains(overrideImage));
 				else
-					Verify.verifyEquals("Verifying Card Content for "+attribute, cardProperties.get(attribute), actualCardDetails.get(attribute));
+					Verify.verifyEquals("Verifying Card Content for "+attribute, actualCardDetails.get(attribute).contains(cardProperties.get(attribute)));
 				break;
 			case "description":
 				if(hideDescription & !"".equals(overrideDescription))
-					Verify.verifyEquals("Verifying Card Content for "+attribute, cardProperties.get(attribute), overrideImage);
+					Verify.verifyEquals("Verifying Card Content for "+attribute, overrideDescription, actualCardDetails.get(attribute));
 				else
 					Verify.verifyEquals("Verifying Card Content for "+attribute, cardProperties.get(attribute), actualCardDetails.get(attribute));			
 				break;
 			case "tags":
 				if(hideTags & !"".equals(overrideTags))
-					Verify.verifyEquals("Verifying Card Content for "+attribute, cardProperties.get(attribute), overrideTags);
+					Verify.verifyEquals("Verifying Card Content for "+attribute, overrideTags, actualCardDetails.get(attribute));
 				else
 					Verify.verifyEquals("Verifying Card Content for "+attribute, cardProperties.get(attribute), actualCardDetails.get(attribute));
 				break;

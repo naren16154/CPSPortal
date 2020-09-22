@@ -5,7 +5,6 @@ import java.util.Map;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.Color;
 
-import com.agilent.cps.core.Verify;
 import com.agilent.cps.widgetactions.DropDown;
 import com.agilent.cps.widgetactions.GUIWidget;
 import com.agilent.cps.widgetactions.Link;
@@ -27,12 +26,12 @@ public class Headline extends BaseComponent{
 	public void verifyPreview(Map<String, String> rowData) {
 		if(rowData.containsKey("headlineLink")) {
 			WebElement headlineLink = DMHelper.getWebElement(new WidgetInfo("linktext="+rowData.get("headlineText"), Link.class));
-			Verify.verifyEquals("Verifying headline link color", "Blue", Color.fromString(headlineLink.getCssValue("color")).asHex());
+			verifyColor("Verifying headline link color", "Blue", Color.fromString(headlineLink.getCssValue("color")).asHex());
 			verifyTextFontSize("Verifying headline link font size", headlineLink, rowData.getOrDefault("textStyle", "H0"));
-			verifyLinkOrbutton(headlineLink, rowData.getOrDefault("headlineLinkOption", "Existing window/tab"), rowData.get("headlineLink") , "Testing | Agilent");
+			verifyLinkOrbutton(headlineLink, rowData.getOrDefault("headlineLinkOption", "Existing window/tab"), rowData.get("headlineLink") , "AutomationTestingPage");
 		}else {
 			WebElement headlineText = DMHelper.getWebElement(new WidgetInfo("xpath=//*[contains(text(),'"+rowData.get("headlineText")+"')]", GUIWidget.class));
-			Verify.verifyEquals("Verifying headline text color", rowData.getOrDefault("selectStyle", "Black"), Color.fromString(headlineText.getCssValue("color")).asHex());
+			verifyColor("Verifying headline text color", rowData.getOrDefault("selectStyle", "Black"), Color.fromString(headlineText.getCssValue("color")).asHex());
 			verifyTextFontSize("Verifying headline text font size", headlineText, rowData.getOrDefault("textStyle", "H0"));
 		}
 	}
