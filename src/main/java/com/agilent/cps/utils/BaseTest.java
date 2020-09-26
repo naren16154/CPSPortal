@@ -133,6 +133,7 @@ public class BaseTest{
 		if(!("".equals(port) || null == port))
 			Constants.port = port;
 		String osName = System.getProperty("os.name");
+		System.out.println("Operating System is : "+osName);
 		if(osName.contains("Windows")) {
 			Constants.chromeDriver = String.format(Constants.chromeDriver, "windows", ".exe");
 			Constants.firefoxDriver = String.format(Constants.firefoxDriver, "windows", ".exe");
