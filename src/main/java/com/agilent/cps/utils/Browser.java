@@ -156,8 +156,9 @@ public class Browser{
 		ChromeOptions options = new ChromeOptions();
 		options.setExperimentalOption("prefs", chromePrefs);
         options.addArguments("--no-sandbox");
+		options.setExperimentalOption("useAutomationExtension", false);
         options.addArguments("--disable-dev-shm-usage");
-		options.addArguments("--headless");
+//		options.addArguments("--headless");
 		DesiredCapabilities DC_Chrome = DesiredCapabilities.chrome();
 		DC_Chrome.setCapability("enableNativeEvents", true);
 		DC_Chrome.setCapability(ChromeOptions.CAPABILITY, options);
