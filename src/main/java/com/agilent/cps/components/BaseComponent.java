@@ -10,11 +10,13 @@ import java.util.Set;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.Color;
 
 import com.agilent.cps.core.AutoPopulator;
 import com.agilent.cps.core.DriverManager;
 import com.agilent.cps.core.DriverManagerHelper;
 import com.agilent.cps.core.Verify;
+import com.agilent.cps.utils.BaseTest;
 import com.agilent.cps.utils.ReadExcel;
 
 enum ColorCode{
@@ -22,6 +24,7 @@ enum ColorCode{
 	blue("#0085d5"),
 	white("#ffffff"),
 	gray("#535557"),
+	primaryblue("#00426a"),
 	defaultcolor("#000000");
 	
 	private String colorCode;
@@ -73,22 +76,32 @@ public abstract class BaseComponent {
 	
 	public void verifyLinkOrbutton(WebElement element, String linkOption, String linkUrl, String newWindowTitle) {
 		WebDriver driver = DM.getCurrentWebDriver();
-		String expectedTarget = "New tab".equalsIgnoreCase(linkOption)?"_blank":("New window".equalsIgnoreCase(linkOption)?"":"_self");
 		Verify.verifyEquals("Verfying Href text", element.getAttribute("href").contains(linkUrl));
-		Verify.verifyEquals("Verfying Link Target Window", expectedTarget, element.getAttribute("target"));
 		int windowsCountBefore = driver.getWindowHandles().size();
 		String windowBefore = driver.getWindowHandle();
+		String target = element.getAttribute("target");
+		String onClick = element.getAttribute("onclick");
 		element.click();
 		Set<String> windows = driver.getWindowHandles();
+		Boolean isWindowCountMatched =  false;
+		Boolean isWindowTargetMatched = false;
 		if("New tab".equalsIgnoreCase(linkOption) || "New window".equalsIgnoreCase(linkOption)) {
-			Verify.verifyEquals("Opening in same tab", windowsCountBefore+1+"", windows.size()+"");
+			isWindowCountMatched =  windowsCountBefore+1 == windows.size();
+			isWindowTargetMatched = false;
+			if("New tab".equalsIgnoreCase(linkOption))
+				isWindowTargetMatched = "_blank".equals(target);
+			else
+				isWindowTargetMatched = "".contentEquals(target) && onClick.contains("window.open");
+			Verify.verifyEquals("Verifying new tab/window opened", isWindowCountMatched && isWindowTargetMatched);
 			for(String window : windows)
 				driver.switchTo().window(window);
 			verifyWindowTitle("Verifying window title", newWindowTitle, driver.getTitle());
 			driver.close();
 			driver.switchTo().window(windowBefore);
 		}else {
-			Verify.verifyEquals("Opening in same tab", windowsCountBefore+"", windows.size()+"");
+			isWindowCountMatched = windowsCountBefore==windows.size();
+			isWindowTargetMatched = "_self".equals(target) || "".equals(target);
+			Verify.verifyEquals("Verifying link opened in same tab", isWindowCountMatched && isWindowTargetMatched);
 			verifyWindowTitle("Verifying window title", newWindowTitle, driver.getTitle());
 			driver.navigate().back();
 		}
@@ -96,11 +109,16 @@ public abstract class BaseComponent {
 	
 	public void verifyColor(String message, String expectedColor, String actualColorCode) {
 		String expectedColorCode = ColorCode.valueOf(expectedColor.toLowerCase()).getColorCode();
-		Verify.verifyEquals(message, expectedColorCode, expectedColorCode);
+		Verify.verifyEquals(message, expectedColorCode, Color.fromString(expectedColorCode).asHex());
+	}
+	
+	public void verifyImage(String message, String expectedImageSrc, String actualImageSrc) {
+		expectedImageSrc = BaseTest.url.charAt(BaseTest.url.length()-1)=='/'?BaseTest.url.substring(0,BaseTest.url.length()-1)+expectedImageSrc:BaseTest.url+expectedImageSrc;
+		Verify.verifyEquals(message, expectedImageSrc, actualImageSrc.replaceAll("%20", " "));
 	}
 	
 	public void verifyWindowTitle(String message, String expectedTitle, String actualTitle) {
-		expectedTitle = actualTitle.endsWith(" | Agilent")?expectedTitle+" | Agilent":expectedTitle;
+		expectedTitle = actualTitle.endsWith(" | Agilent")?(expectedTitle.length()>54?expectedTitle.substring(0,54):expectedTitle)+" | Agilent":expectedTitle;
 		Verify.verifyEquals(message, expectedTitle, actualTitle);
 	}
 	

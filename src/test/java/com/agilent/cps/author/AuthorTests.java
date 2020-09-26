@@ -78,6 +78,11 @@ public class AuthorTests extends BaseAuthorTest{
 				DM.getCurrentWebDriver().switchTo().window(window);
 			
 			componentObject.verifyPreview(rowData);
+			WidgetInfo stickyNav = new WidgetInfo("xpath=//section[@class='secondary-nav sticky-top']", GUIWidget.class);
+			if(DM.widgetVisible(stickyNav, 2, .5)) {
+				DM.getJSExecutor().executeScript("window.scrollTo(0,0);");
+				DM.getJSExecutor().executeScript("arguments[0].setAttribute('style', 'display:none')", DriverManagerHelper.getInstance().getWebElement(stickyNav));
+			}
 			ScreenShotUtility.getInstance().takeScreenshot();
 			
 			DM.getCurrentWebDriver().close();

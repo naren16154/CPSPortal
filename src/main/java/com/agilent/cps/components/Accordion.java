@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.Color;
 
 import com.agilent.cps.core.DriverManagerHelper;
 import com.agilent.cps.core.Verify;
@@ -126,11 +125,11 @@ public class Accordion extends BaseComponent{
 	private void verifyLinkFunctionality(String textColor, WebElement webElement, Map<String, String> linkDetails) {
 		if(linkDetails.containsKey("headlineLink")) {
 			WebElement link = DMHelper.getWebElement(new WidgetInfo("linktext="+linkDetails.get("linkText"), Link.class));
-			verifyColor("Verfying Link Color", "Blue", Color.fromString(link.getCssValue("color")).asHex());
+			verifyColor("Verfying Link Color", "Blue", link.getCssValue("color"));
 			verifyLinkOrbutton(link, linkDetails.getOrDefault("linkAction", "Existing window/tab"), linkDetails.get("headlineLink"), "");
 		}else {
 			WidgetInfo link = new WidgetInfo("xpath=//ul[contains(text(),'"+linkDetails.get("linkText")+"')]", GUIWidget.class);
-			Verify.verifyEquals("Verfying Link Color", textColor, Color.fromString(DMHelper.getWebElement(link).getCssValue("color")).asHex());
+			verifyColor("Verfying Link Color", textColor, DMHelper.getWebElement(link).getCssValue("color"));
 		}
 	}
 

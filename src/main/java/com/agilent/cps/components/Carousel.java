@@ -102,18 +102,19 @@ public class Carousel extends BaseComponent{
 			String transitionDelay = rowData.get("transitionDelay");
 			String disableTransitionOnHover = rowData.getOrDefault("pauseOnHoverDisable", "uncheck");
 			
+			WidgetInfo carousalHeroList = new WidgetInfo("xpath=//div[@id='carousel--hero']/ol[@class='carousel-indicators']/li", GUIWidget.class);
+			List<WebElement> elementList = DMHelper.getWebElements(carousalHeroList);
+			WidgetInfo carousalActiveTab = new WidgetInfo("xpath=//div[@id='carousel--hero']/ol[@class='carousel-indicators']/li[@class='active']", GUIWidget.class);
+			Actions actions = new Actions(DM.getCurrentWebDriver());
+			DM.getJSExecutor().executeScript("arguments[0].scrollIntoView(true);", elementList.get(0));
+			DriverManagerHelper.sleep(1);
 			if("uncheck".equalsIgnoreCase(disableTransitionOnHover)) {
-				WidgetInfo carousalHeroList = new WidgetInfo("xpath=//div[@id='carousel--hero']/ol[@class='carousel-indicators']/li", GUIWidget.class);
-				List<WebElement> elementList = DMHelper.getWebElements(carousalHeroList);
-				WidgetInfo carousalActiveTab = new WidgetInfo("xpath=//div[@id='carousel--hero']/ol[@class='carousel-indicators']/li[@class='active']", GUIWidget.class);
-				
 				String carouselTabBefore = DM.GUIWidget(carousalActiveTab).getText();
-				DriverManagerHelper.sleep((Integer.parseInt(transitionDelay)/1000)+1);
+				DriverManagerHelper.sleep((Integer.parseInt(transitionDelay)/1000)+5);
 				String carouselTabAfter = DM.GUIWidget(carousalActiveTab).getText();
 				
 				Verify.verifyEquals("Verifying Auto Transition Enabled without hover", !carouselTabBefore.equalsIgnoreCase(carouselTabAfter));
 				
-				Actions actions = new Actions(DM.getCurrentWebDriver());
 				actions.moveToElement(elementList.get(0)).perform();
 				
 				carouselTabBefore = DM.GUIWidget(carousalActiveTab).getText();
@@ -123,11 +124,6 @@ public class Carousel extends BaseComponent{
 				Verify.verifyEquals("Verifying Auto Transition Disabled with hover", carouselTabBefore.equalsIgnoreCase(carouselTabAfter));
 				
 			}else {
-				WidgetInfo carousalHeroList = new WidgetInfo("xpath=//div[@id='carousel--hero']/ol[@class='carousel-indicators']/li", GUIWidget.class);
-				List<WebElement> elementList = DMHelper.getWebElements(carousalHeroList);
-				WidgetInfo carousalActiveTab = new WidgetInfo("xpath=//div[@id='carousel--hero']/ol[@class='carousel-indicators']/li[@class='active']", GUIWidget.class);
-				
-				Actions actions = new Actions(DM.getCurrentWebDriver());
 				actions.moveToElement(elementList.get(0)).perform();
 				
 				for(int i=0; i< elementList.size(); i++) {

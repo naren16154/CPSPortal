@@ -2,8 +2,6 @@ package com.agilent.cps.components;
 
 import java.util.Map;
 
-import org.openqa.selenium.support.Color;
-
 import com.agilent.cps.core.Verify;
 import com.agilent.cps.widgetactions.Label;
 import com.agilent.cps.widgetactions.RTE;
@@ -22,16 +20,22 @@ public class TextBlock extends BaseComponent{
 		WidgetInfo rteTextPublish = new WidgetInfo("xpath=//div[contains(@class, 'textblock')]", Label.class);
 		
 		Verify.verifyEquals("Verifying Textblock Content", rowData.get("rteText"), DM.label(rteTextPublish).getDisplayValue());
-		
+		String textColor = "Black";
+		String textSize = "13px";
 		if(rowData.containsKey("selectStyle")) {
-			String expectedColor = "#000000";
 			if(rowData.get("selectStyle").contains("White"))
-				expectedColor="#ffffff";
+				textColor="White";
 			if(rowData.get("selectStyle").contains("Gray"))
-				expectedColor="#535557";
-			Verify.verifyEquals("Verifying Textblock Text Color", expectedColor, Color.fromString(DMHelper.getWebElement(rteTextPublish).getCssValue("color")).asHex());
-		}else
-			Verify.verifyEquals("Verifying Textblock Text Color", "#000000", Color.fromString(DMHelper.getWebElement(rteTextPublish).getCssValue("color")).asHex());
+				textColor="Gray";
+			if(rowData.get("selectStyle").contains("para"))
+				textSize="15px";
+			if(rowData.get("selectStyle").contains("Small"))
+				textSize="13px";
+			if(rowData.get("selectStyle").contains("Label"))
+				textSize="11px";
+		}
+		verifyColor("Verifying Textblock Text Color", textColor, DMHelper.getWebElement(rteTextPublish).getCssValue("color"));
+		Verify.verifyEquals("Verifying Textblock Text size", textSize, DMHelper.getWebElement(rteTextPublish).getCssValue("font-size"));
 	}
 
 	@Override

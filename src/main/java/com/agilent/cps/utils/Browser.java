@@ -151,6 +151,7 @@ public class Browser{
 		HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
 		chromePrefs.put("profile.default_content_settings.popups", 0);
 		chromePrefs.put("safebrowsing.enabled", "true");
+		chromePrefs.put("enableNativeEvents", "true");
 //		chromePrefs.put("download.default_directory", System.getProperty("user.dir")+"\\metadata");
 		ChromeOptions options = new ChromeOptions();
 		options.setExperimentalOption("prefs", chromePrefs);
@@ -163,13 +164,13 @@ public class Browser{
 			String url = "http://localhost:"+Constants.port+"/wd/hub";
 			
 			try {
-				driver = new RemoteWebDriver(new URL(url), DC_Chrome);
+				driver = new RemoteWebDriver(new URL(url), options);
 			} catch (MalformedURLException e) {
 				e.printStackTrace();
 			}
 		}
 		else
-			driver = new ChromeDriver(DC_Chrome);
+			driver = new ChromeDriver(options);
 			
 		return driver;
 	}

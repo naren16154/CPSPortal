@@ -38,19 +38,27 @@ public class Hero extends BaseComponent {
 		String carouselHeroText = "";
 		if(DM.widgetExists(new WidgetInfo("xpath=//div[@class='carousel-item active']", GUIWidget.class), 1, .5))
 			carouselHeroText = "//div[@class='carousel-item active']";
+		WidgetInfo heroTextSection = new WidgetInfo("xpath="+carouselHeroText+"//div[@class='text-section']", GUIWidget.class);
 		WidgetInfo heroText = new WidgetInfo("xpath="+carouselHeroText+"//div[@class='text-section__title']", Label.class);
 		WidgetInfo heroDescription = new WidgetInfo("xpath="+carouselHeroText+"//div[@class='text-section__description']", Label.class);
 		WidgetInfo brandBar = new WidgetInfo("xpath="+carouselHeroText+"//div[@class='brand-lines']", GUIWidget.class);
 		WidgetInfo imageSection = new WidgetInfo("xpath="+carouselHeroText+"//div[@class='image-section']/img", GUIWidget.class);
+		verifyHeroStyle(rowData, brandBar, heroTextSection);
 		if(rowData.containsKey("heroHeadlineText"))
 			Verify.verifyEquals("Verifying Hero Text", rowData.get("heroHeadlineText"), DM.label(heroText).getDisplayValue());
 		
 		if(rowData.containsKey("heroText"))
 			Verify.verifyEquals("Verifying Hero Description", rowData.get("heroText"), DM.label(heroDescription).getDisplayValue());
-		
-		if(rowData.containsKey("backgroungImage")) {
+		if(rowData.containsKey("selectStyle")) {
+			if(rowData.get("selectStyle").contains("No Image"))
+				Verify.verifyEquals("Verifying Image should not display", !DM.widgetVisible(imageSection, 1, .5));
+			else {
+				Verify.verifyEquals("Verifying presence of Image", DM.widgetVisible(imageSection, 1, .5));
+				verifyImage("Verifying Image Path", rowData.get("backgroungImage"), DM.GUIWidget(imageSection).getAttribute("src"));
+			}
+		}else if(rowData.containsKey("backgroungImage")) {
 			Verify.verifyEquals("Verifying presence of Image", DM.widgetVisible(imageSection, 1, .5));
-			Verify.verifyEquals("Verifying Image Path", DM.GUIWidget(imageSection).getAttribute("src").contains(rowData.get("backgroungImage")));
+			verifyImage("Verifying Image Path", rowData.get("backgroungImage"), DM.GUIWidget(imageSection).getAttribute("src"));
 		}
 		
 		if(rowData.containsKey("addButton")) {
@@ -60,14 +68,26 @@ public class Hero extends BaseComponent {
 			verifyWindowTitle("Verifying window title", "AutomationTestingPage", DM.getCurrentWebDriver().getTitle());
 			DMHelper.getWebDriver().navigate().back();
 		}
-		
+	}
+
+	private void verifyHeroStyle(Map<String, String> rowData, WidgetInfo brandBar, WidgetInfo heroTextSection) {
+		boolean isBrandbarPesent = false;
+		String textSectionBgColor = "White";
+		String textSectionFontColor = "Black";
 		if(rowData.containsKey("selectStyle")) {
 			if(rowData.get("selectStyle").contains("Show Brand Bar"))
-				Verify.verifyEquals("Verifying presence of Brandbar", DM.widgetVisible(brandBar, 1, .5));
-		}else {
-			Verify.verifyEquals("Verifying Nonpresence of Brandbar", !DM.widgetVisible(brandBar, 1, .5));
+				isBrandbarPesent = true;
+			if(rowData.get("selectStyle").contains("Content Area Background Color Primary")) {
+				textSectionBgColor = "PrimaryBlue";
+				textSectionFontColor = "White";
+			}
 		}
-			
+		if(isBrandbarPesent)
+			Verify.verifyEquals("Verifying Nonpresence of Brandbar", DM.widgetVisible(brandBar, 1, .5));
+		else
+			Verify.verifyEquals("Verifying Nonpresence of Brandbar", DM.GUIWidget(brandBar).getCSSValue("display").equalsIgnoreCase("none"));
+		verifyColor("Verifying BG Color of hero content", textSectionBgColor, DM.GUIWidget(heroTextSection).getCSSValue("background-color"));
+		verifyColor("Verifying Font Color of hero content", textSectionFontColor, DM.GUIWidget(heroTextSection).getCSSValue("color"));
 	}
 
 }
