@@ -17,6 +17,7 @@ import com.agilent.cps.core.DriverManager;
 import com.agilent.cps.core.DriverManagerHelper;
 import com.agilent.cps.core.Verify;
 import com.agilent.cps.utils.BaseTest;
+import com.agilent.cps.utils.Logger;
 import com.agilent.cps.utils.ReadExcel;
 
 enum ColorCode{
@@ -61,13 +62,17 @@ public abstract class BaseComponent {
 		
 		List<String> actualStyles = Arrays.asList(styles.split(","));
 		
-		List<WebElement> stylesList = DM.getCurrentWebDriver().findElements(By.xpath("//form[@id='editor-styleselector-form']//coral-selectlist-item[@class='coral3-SelectList-item']"));
+		List<WebElement> stylesList = DM.getCurrentWebDriver().findElements(By.xpath("//form[@id='editor-styleselector-form']//coral-selectlist-item"));
 		
-		for(WebElement style : stylesList) {
-			boolean selected = Boolean.parseBoolean(style.getAttribute("aria-selected"));
+		for(int i=0; i<stylesList.size(); i++) {
+			boolean selected = Boolean.parseBoolean(stylesList.get(i).getAttribute("aria-selected"));
+			String styleName = stylesList.get(i).getText(); 
+			if(selected ^ actualStyles.contains(styleName))
+				stylesList.get(i).click();
+			if(actualStyles.contains(styleName))
+				Logger.getInstance().info("Selected Style : "+styleName);
 			
-			if(selected ^ actualStyles.contains(style.getText()))
-				style.click();
+			stylesList = DM.getCurrentWebDriver().findElements(By.xpath("//form[@id='editor-styleselector-form']//coral-selectlist-item"));
 		}
 		
 		DM.getCurrentWebDriver().findElements(By.xpath("//button[@icon='check']")).get(1).click();
@@ -134,25 +139,25 @@ public abstract class BaseComponent {
 		
 		switch (fontStyle.toLowerCase()) {
 		case "h0":
-			expectedFontSize = "32px";
+			expectedFontSize = "36px";
 			break;
 		case "h1":
-			expectedFontSize = "32px";
+			expectedFontSize = "36px";
 			break;
 		case "h2":
-			expectedFontSize = "24px";
+			expectedFontSize = "28px";
 			break;
 		case "h3":
-			expectedFontSize = "20.8px";
+			expectedFontSize = "22px";
 			break;
 		case "h4":
-			expectedFontSize = "16px";
+			expectedFontSize = "18px";
 			break;
 		case "h5":
-			expectedFontSize = "12.8px";
+			expectedFontSize = "15px";
 			break;
 		case "h6":
-			expectedFontSize = "11.2px";
+			expectedFontSize = "13px";
 			break;
 		default:
 			expectedFontSize = "NA";

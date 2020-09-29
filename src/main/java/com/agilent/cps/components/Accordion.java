@@ -126,7 +126,7 @@ public class Accordion extends BaseComponent{
 		if(linkDetails.containsKey("headlineLink")) {
 			WebElement link = DMHelper.getWebElement(new WidgetInfo("linktext="+linkDetails.get("linkText"), Link.class));
 			verifyColor("Verfying Link Color", "Blue", link.getCssValue("color"));
-			verifyLinkOrbutton(link, linkDetails.getOrDefault("linkAction", "Existing window/tab"), linkDetails.get("headlineLink"), "");
+			verifyLinkOrbutton(link, linkDetails.getOrDefault("linkAction", "Existing window/tab"), linkDetails.get("headlineLink"), "AutomationTestingPage");
 		}else {
 			WidgetInfo link = new WidgetInfo("xpath=//ul[contains(text(),'"+linkDetails.get("linkText")+"')]", GUIWidget.class);
 			verifyColor("Verfying Link Color", textColor, DMHelper.getWebElement(link).getCssValue("color"));

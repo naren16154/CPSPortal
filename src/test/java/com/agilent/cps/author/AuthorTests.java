@@ -1,5 +1,7 @@
 package com.agilent.cps.author;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,12 +78,12 @@ public class AuthorTests extends BaseAuthorTest{
 			
 			for(String window : DM.getCurrentWebDriver().getWindowHandles())
 				DM.getCurrentWebDriver().switchTo().window(window);
-			
+			DriverManagerHelper.sleep(2);
 			componentObject.verifyPreview(rowData);
 			WidgetInfo stickyNav = new WidgetInfo("xpath=//section[@class='secondary-nav sticky-top']", GUIWidget.class);
 			if(DM.widgetVisible(stickyNav, 2, .5)) {
-				DM.getJSExecutor().executeScript("window.scrollTo(0,0);");
 				DM.getJSExecutor().executeScript("arguments[0].setAttribute('style', 'display:none')", DriverManagerHelper.getInstance().getWebElement(stickyNav));
+				DriverManagerHelper.sleep(1);
 			}
 			ScreenShotUtility.getInstance().takeScreenshot();
 			
@@ -159,9 +161,16 @@ public class AuthorTests extends BaseAuthorTest{
 			}
 				
 		}
-		Object [][] array = new Object[testDetails.size()][3];
+		
+		String tests = System.getProperty("tests", null);
+		List<String> testList = new ArrayList<String>();
+		if(null != tests && !"".equals(tests))
+			testList = Arrays.asList(tests.split(","));
+		Object [][] array = new Object[testList.size()==0?testDetails.size():testList.size()][3];
 		int count = 0;
 		for(String testName : testDetails.keySet()) {
+			if(testList.size()>0 && !testList.contains(testName))
+				continue;
 			String value = testDetails.get(testName);
 			array[count][0] = value.split("#")[0];
 			array[count][1] = testName;

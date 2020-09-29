@@ -26,7 +26,7 @@ public class ScreenShotUtility {
 	public ScreenShotUtility()
 	{
 		String basePath = "logs";
-		imagePath = basePath+"\\images\\";
+		imagePath = basePath+"/images/";
 		File file = new File(imagePath); 
 		if(!file.exists())
 			file.mkdirs();

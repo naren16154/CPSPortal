@@ -28,7 +28,11 @@ public class GUIWidget implements IGUIWidget{
 	public void click()
 	{
 		WebElement element = managerHelper.getWebElement(widgetInfo);
-		element.click();
+		String headless = System.getProperty("headless", "false");
+		if(Boolean.parseBoolean(headless))
+			clickJS(element);
+		else
+			element.click();
 	}
 	
 	public void jsClick()

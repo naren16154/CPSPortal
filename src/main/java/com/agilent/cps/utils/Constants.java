@@ -8,7 +8,7 @@ public class Constants {
 	public static String firefoxDriver = "lib/%s/geckodriver%s";
 	public static String ieDriver = "lib/IEDriverServer%s";
 	public static String edgeDriver = "";
-	public static String pageLoadTimeout = "180";
+	public static String pageLoadTimeout = "60";
 	public static String implicitWait = "1";
 	public static String screenshotPath = "snapshots/";
 	
