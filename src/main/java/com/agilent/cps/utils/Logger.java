@@ -33,7 +33,7 @@ public class Logger extends Constants{
 			File file = new File(logPath);
 			if(!file.exists())
 				file.mkdirs();
-			logFile = logPath+"\\"+logName+".xml";
+			logFile = logPath+"/"+logName+".xml";
 			FileOutputStream fileOut = null;
 			try {
 				fileOut = new FileOutputStream(logFile);
