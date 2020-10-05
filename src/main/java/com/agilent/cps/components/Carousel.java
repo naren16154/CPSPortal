@@ -71,9 +71,9 @@ public class Carousel extends BaseComponent{
 	
 	@Override
 	public void verifyPreview(Map<String, String> rowData) {
+		verifyAutoSlidefeature(rowData);
 		verifyCarousalList(rowData.get("addHeroComponents"));
 		verifyHeroComponents(rowData);
-		verifyAutoSlidefeature(rowData);
 	}
 	
 	public void verifyHeroComponents(Map<String, String> rowData) {
@@ -101,16 +101,16 @@ public class Carousel extends BaseComponent{
 		if("check".equalsIgnoreCase(autoSlide)) {
 			String transitionDelay = rowData.get("transitionDelay");
 			String disableTransitionOnHover = rowData.getOrDefault("pauseOnHoverDisable", "uncheck");
-			
 			WidgetInfo carousalHeroList = new WidgetInfo("xpath=//div[@id='carousel--hero']/ol[@class='carousel-indicators']/li", GUIWidget.class);
 			List<WebElement> elementList = DMHelper.getWebElements(carousalHeroList);
 			WidgetInfo carousalActiveTab = new WidgetInfo("xpath=//div[@id='carousel--hero']/ol[@class='carousel-indicators']/li[@class='active']", GUIWidget.class);
 			Actions actions = new Actions(DM.getCurrentWebDriver());
-			DM.getJSExecutor().executeScript("arguments[0].scrollIntoView(true);", elementList.get(0));
-			DriverManagerHelper.sleep(1);
+			actions.moveToElement(elementList.get(0)).perform();
+			actions.moveToElement(DM.getCurrentWebDriver().findElement(By.linkText("AutomationTestingPage"))).perform();
+//			DM.getJSExecutor().executeScript("arguments[0].scrollIntoView(true);", elementList.get(0));
 			if("uncheck".equalsIgnoreCase(disableTransitionOnHover)) {
 				String carouselTabBefore = DM.GUIWidget(carousalActiveTab).getText();
-				DriverManagerHelper.sleep((Integer.parseInt(transitionDelay)/1000)+5);
+				DriverManagerHelper.sleep((Integer.parseInt(transitionDelay)/1000)+1);
 				String carouselTabAfter = DM.GUIWidget(carousalActiveTab).getText();
 				
 				Verify.verifyEquals("Verifying Auto Transition Enabled without hover", !carouselTabBefore.equalsIgnoreCase(carouselTabAfter));

@@ -111,6 +111,8 @@ public class AuthorTests extends BaseAuthorTest{
 	
 	@Test(groups= {"author"}, priority = 0)
 	public void createPageForAuthorTests() throws Exception {
+		launchBrowser();
+		
 		DM.GUIWidget(new WidgetInfo("xpath=//div[text()='Sites']", GUIWidget.class)).click();
 		
 		String pagePath = configProperties.getProperty("authorPagePath");
@@ -124,7 +126,9 @@ public class AuthorTests extends BaseAuthorTest{
 				DM.link(new WidgetInfo("linktext=Page", Link.class)).click();
 				DM.GUIWidget(new WidgetInfo("xpath=//coral-card-title[text()='PEP Core Template']", GUIWidget.class)).click();
 				DM.GUIWidget(new WidgetInfo("xpath=//button/coral-button-label[text()='Next']", GUIWidget.class)).click();
-				DM.textField(new WidgetInfo("name=./jcr:title", TextField.class)).setDisplayValue(path[i]);
+				WidgetInfo title = new WidgetInfo("name=./jcr:title", TextField.class);
+				DM.widgetEnabled(title, 5, .5);
+				DM.textField(title).setDisplayValue(path[i]);
 				DM.GUIWidget(new WidgetInfo("xpath=//button/coral-button-label[text()='Create']", GUIWidget.class)).click();
 				DM.GUIWidget(new WidgetInfo("xpath=//button/coral-button-label[text()='Open']", GUIWidget.class)).click();
 			}

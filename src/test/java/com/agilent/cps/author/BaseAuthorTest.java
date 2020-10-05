@@ -6,7 +6,6 @@ import org.openqa.selenium.By;
 import org.testng.ITest;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 
 import com.agilent.cps.core.DriverManagerHelper;
@@ -19,7 +18,7 @@ public class BaseAuthorTest extends BaseTest implements ITest{
 	
 	String testname;
 	
-	@BeforeClass(alwaysRun = true)
+//	@BeforeClass(alwaysRun = true)
 	public void launchBrowser() {
 		String username;
 		String password;
@@ -45,26 +44,6 @@ public class BaseAuthorTest extends BaseTest implements ITest{
 		DM.textField(new WidgetInfo("id=username", TextField.class)).setDisplayValue(username);
 		DM.textField(new WidgetInfo("id=password", TextField.class)).setDisplayValue(password);
 		DM.button(new WidgetInfo("id=submit-button", Button.class)).click();
-		
-		/*
-		 * String[] path = { "pathology-education", "Language Masters", "English",
-		 * "Testing" };
-		 * 
-		 * for (int i = 0; i < path.length; i++) { if (i != path.length - 1) {
-		 * DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='" + path[i] +
-		 * "']")).click(); } else {
-		 * DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='" + path[i] +
-		 * "']/../..//img")).click(); } }
-		 * 
-		 * DM.getCurrentWebDriver().findElement(By.
-		 * xpath("//button/coral-button-label[contains(text(), 'Edit')]")).click();
-		 * 
-		 * for (int i = 0; i <= 6; i++) { DriverManagerHelper.sleep(5); if
-		 * (DM.getCurrentWebDriver().getWindowHandles().size() == 2) break; } for
-		 * (String window : DM.getCurrentWebDriver().getWindowHandles())
-		 * DM.getCurrentWebDriver().switchTo().window(window);
-		 */
-		 
 	}
 	
 	@BeforeMethod(alwaysRun = true)
@@ -81,27 +60,29 @@ public class BaseAuthorTest extends BaseTest implements ITest{
 	
 	@AfterClass(alwaysRun = true)
 	public void teardown() {
-		DriverManagerHelper.getInstance().switchWindow("AEM Sites");
-		
-		String[] path = configProperties.getProperty("authorPagePath").split("/");
-
-		for (int i = 0; i < path.length; i++) {
-			if (i != path.length - 1)
-				DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='" + path[i] + "']")).click();
-			else
-				DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='" + path[i] + "']/../..//img")).click();
-			DriverManagerHelper.sleep(1);
+		try {
+			DriverManagerHelper.getInstance().switchWindow("AEM Sites");
+			
+			String[] path = configProperties.getProperty("authorPagePath").split("/");
+	
+			for (int i = 0; i < path.length; i++) {
+				if (i != path.length - 1)
+					DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='" + path[i] + "']")).click();
+				else
+					DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='" + path[i] + "']/../..//img")).click();
+				DriverManagerHelper.sleep(1);
+			}
+			
+			DM.button(new WidgetInfo("xpath=//button[@icon='more']", Button.class)).click();
+			
+			DM.getCurrentWebDriver().findElement(By.xpath("//button/coral-button-label[contains(text(),'Delete')]")).click();
+			
+			DM.getCurrentWebDriver().findElements(By.xpath("//button/coral-button-label[text()='Delete']")).get(1).click();
+			
+			DriverManagerHelper.sleep(2);
+		}finally {
+			DriverManagerHelper.getInstance().tearDown();
 		}
-		
-		DM.button(new WidgetInfo("xpath=//button[@icon='more']", Button.class)).click();
-		
-		DM.getCurrentWebDriver().findElement(By.xpath("//button/coral-button-label[contains(text(),'Delete')]")).click();
-		
-		DM.getCurrentWebDriver().findElements(By.xpath("//button/coral-button-label[text()='Delete']")).get(1).click();
-		
-		DriverManagerHelper.sleep(2);
-		
-		DriverManagerHelper.getInstance().tearDown();
 	}
 
 	@Override

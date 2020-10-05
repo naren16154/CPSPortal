@@ -30,7 +30,7 @@ public class Listener implements ITestListener{
 
 	@Override
 	public void onTestFailure(ITestResult result) {
-		if(! (result.getThrowable() instanceof AssertionError)) {
+		if(! (result.getThrowable() instanceof AssertionError || result.getName().equalsIgnoreCase("createPageForAuthorTests"))) {
 			Logger.getInstance().error(result.getThrowable());
 			try {
 				DriverManager DM = DriverManager.getInstance();

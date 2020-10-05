@@ -29,7 +29,8 @@ public class Video extends BaseComponent{
 	public static class Widgets {
 		public static final WidgetInfo dropTarget = new WidgetInfo("xpath=//coral-fileupload[@name='./file']", GUIWidget.class);
 		public static final WidgetInfo videoDrag = new WidgetInfo("xpath=//coral-card", GUIWidget.class);
-		public static final WidgetInfo assetFilter = new WidgetInfo("xpath=//foundation-autocomplete[@name='assetfilter_image_path']//input", TextField.class);
+		public static final WidgetInfo assetFilter_Image = new WidgetInfo("xpath=//foundation-autocomplete[@name='assetfilter_image_path']//input", TextField.class);
+		public static final WidgetInfo assetFilter_Video = new WidgetInfo("xpath=//foundation-autocomplete[@name='assetfilter_video_path']//input", TextField.class);
 		public static final WidgetInfo assetType = new WidgetInfo("name=assetfilter_type_selector", DropDown.class);
 	}
 	
@@ -37,8 +38,8 @@ public class Video extends BaseComponent{
 		DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Done']")).click();
 		DriverManagerHelper.sleep(1);
 		DM.button(new WidgetInfo("xpath=//button[@title='Toggle Side Panel']", Button.class)).click();
-		DM.textField(Widgets.assetFilter).setDisplayValue(data);
 		DM.dropDown(Widgets.assetType).setDisplayValue("Videos");
+		DM.textField(Widgets.assetFilter_Video).setDisplayValue(data);
 		DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='"+componentName+"']")).click();;
 		DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Configure']")).click();
 		Actions actions = new Actions(DM.getCurrentWebDriver());
@@ -51,8 +52,8 @@ public class Video extends BaseComponent{
 		DM.button(new WidgetInfo("xpath=//button[@title='Toggle Side Panel']", Button.class)).click();
 		DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='"+componentName+"']")).click();;
 		DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Configure']")).click();
-		DM.textField(Widgets.assetFilter).setDisplayValue(data);
 		DM.dropDown(Widgets.assetType).setDisplayValue("Images");
+		DM.textField(Widgets.assetFilter_Image).setDisplayValue(data);
 		Actions actions = new Actions(DM.getCurrentWebDriver());
 		actions.dragAndDrop(DMHelper.getWebElement(Widgets.videoDrag), DMHelper.getWebElements(Widgets.dropTarget).get(1)).perform();
 	}

@@ -87,6 +87,7 @@ public abstract class BaseComponent {
 		String target = element.getAttribute("target");
 		String onClick = element.getAttribute("onclick");
 		element.click();
+		DriverManagerHelper.sleep(5);
 		Set<String> windows = driver.getWindowHandles();
 		Boolean isWindowCountMatched =  false;
 		Boolean isWindowTargetMatched = false;
