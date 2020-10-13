@@ -45,8 +45,8 @@ public class Accordion extends BaseComponent{
 		LinkList linkList = new LinkList();
 		for(int i=0; i< linksData.size(); i++) {
 			List<WebElement> dragComponents = DM.getCurrentWebDriver().findElements(By.xpath("//div[@data-text='Drag components here']"));
-			dragComponents.get(i).click();
-			DM.getCurrentWebDriver().findElements(By.xpath("//button[@icon='add']/coral-icon")).get(1).click();
+			DM.clickJS(dragComponents.get(i));
+			DM.clickJS(DM.getCurrentWebDriver().findElements(By.xpath("//button[@icon='add']/coral-icon")).get(1));
 			
 			DM.textField(new WidgetInfo("xpath=//coral-search//input", TextField.class)).setDisplayValue(linkList.getComponentName());
 			DriverManagerHelper.sleep(2);

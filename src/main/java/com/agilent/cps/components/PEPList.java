@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -75,7 +76,7 @@ public class PEPList extends BaseComponent {
 //		Webinar Page
 		public static final WidgetInfo webinarAddButton = new WidgetInfo("xpath=//coral-multifield[@data-granite-coral-multifield-name='./webinarList']/button/coral-button-label[text()='Add']", Button.class);
 		public static final WidgetInfo webinarPageSource = new WidgetInfo("name=./webinarList/item%s/./webPageSource", ComboBox.class);
-		public static final WidgetInfo webinarHeadline = new WidgetInfo("name=./webinarList/item%s/./webHeadlineText", TextField.class);
+		public static final WidgetInfo headline = new WidgetInfo("name=./webinarList/item%s/./webHeadlineText", TextField.class);
 		public static final WidgetInfo webinarHideTextArea = new WidgetInfo("name=./webinarList/item%s/./webHideTextArea", CheckBox.class);
 		public static final WidgetInfo webinarTextArea = new WidgetInfo("name=./webinarList/item%s/./webTextArea", RTE.class);
 		public static final WidgetInfo webinarHideTags = new WidgetInfo("name=./webinarList/item%s/./webHideContentTags", CheckBox.class);
@@ -162,7 +163,7 @@ public class PEPList extends BaseComponent {
 				columnName = "page";
 			}
 			for(Map<String, String> singlePageData : iterationsData)
-				propertiesData.putAll(getPageProperties(singlePageData.get(columnName), layoutType));
+				propertiesData.putAll(getPageProperties(singlePageData, singlePageData.get(columnName), layoutType));
 		}
 		System.out.println(propertiesData);
 		
@@ -180,9 +181,12 @@ public class PEPList extends BaseComponent {
 		List<Map<String, String>> overrideCardsData = "Child pages".equalsIgnoreCase(buildList)?getDataMap(rowData.get("AddChildPages")):(layoutType.contains("Webinar")?getDataMap(rowData.get("AddWebinars")):getDataMap(rowData.get("AddFixedList")));
 		
 		List<WebElement> cards = driver.findElements(By.xpath("//div[contains(@class,'cards-container')]//div[@class='mdc-card card-component']"));
+		
+		Map<String, String> expectedCardDetails = new HashMap<String, String>();
+		
 		for(int i=0; i< cards.size(); i++) {
 			Map<String, String> overrideCardData = "Child pages".equalsIgnoreCase(buildList)?overrideCardsData.get(0):overrideCardsData.get(actualCardsCount);
-			verifyCardProperties(cards.get(i), layoutType, buildList, overrideCardData, propertiesData, actualCardsCount, false);
+			expectedCardDetails = verifyCardProperties(cards.get(i), layoutType, buildList, overrideCardData, propertiesData, actualCardsCount, false);
 			if("Grid Text".equalsIgnoreCase(layoutType) || "Grid text with image".equalsIgnoreCase(layoutType))
 				verifyPresenceOfBrandBar(cards.get(i), rowData.getOrDefault("showBrandLines", "uncheck"));
 			if(layoutType.contains("Webinar")) {
@@ -190,22 +194,23 @@ public class PEPList extends BaseComponent {
 				if(overrideCardData.containsKey("addCTAButtons"))
 					iterationsData = getDataMap(overrideCardData.get("addCTAButtons"));
 				for(Map<String, String> singleButtonData : iterationsData) {
-					verifyCTAButtonsFunctionality(cards.get(i), layoutType, buildList, singleButtonData, false);
+					verifyCTAButtonsFunctionality(cards.get(i), layoutType, buildList, singleButtonData, expectedCardDetails, false);
 					cards = driver.findElements(By.xpath("//div[contains(@class,'cards-container')]//div[@class='mdc-card card-component']"));
 				}
 			}else
-				verifyCTAButtonsFunctionality(cards.get(i), layoutType, buildList, overrideCardData, false);
+				verifyCTAButtonsFunctionality(cards.get(i), layoutType, buildList, overrideCardData, expectedCardDetails, false);
 			actualCardsCount++;
+			DriverManagerHelper.sleep(2);
 			cards = driver.findElements(By.xpath("//div[contains(@class,'cards-container')]//div[@class='mdc-card card-component']"));
 		}
 		
 		if("Featured Card".equalsIgnoreCase(layoutType)) {
-			List<WebElement> featuredCards = driver.findElements(By.xpath("//div[contains(@class,'cards-container')]/div[@class='col right']/div"));
+			List<WebElement> featuredCards = driver.findElements(By.xpath("//div[contains(@class,'cards-container')]//div[@class='mdc-card card-component size-large']"));
 			Verify.verifyEquals("Featured Cards Count", 1+"", featuredCards.size()+"");
 			for(WebElement card : featuredCards) {
 				Map<String, String> overrideCardData = "Child pages".equalsIgnoreCase(buildList)?overrideCardsData.get(0):overrideCardsData.get(actualCardsCount);
-				verifyCardProperties(card, layoutType, buildList, overrideCardData, propertiesData, actualCardsCount, true);
-				verifyCTAButtonsFunctionality(card,layoutType, buildList, overrideCardData, true);
+				expectedCardDetails = verifyCardProperties(card, layoutType, buildList, overrideCardData, propertiesData, actualCardsCount, true);
+				verifyCTAButtonsFunctionality(card,layoutType, buildList, overrideCardData, expectedCardDetails, true);
 				actualCardsCount++;
 			}
 		}
@@ -244,7 +249,7 @@ public class PEPList extends BaseComponent {
 		
 		List<WebElement> filters = driver.findElements(By.xpath("//div[contains(@id,'mdc-chip')]"));
 		for(WebElement filter : filters) {
-			String tag = filter.getText().trim();
+			String tag = filter.getText().trim().toUpperCase();
 			if(actualTagsList.contains(tag))
 				Verify.verifyEquals("Filter '"+tag+"' displayed more than one time in filter section", false);
 			actualTagsList.add(tag);
@@ -252,15 +257,16 @@ public class PEPList extends BaseComponent {
 		verifyTagsList(expectedTagsList, actualTagsList);
 		Set<String> selectedFilters = new HashSet<String>();
 		for(int i=0; i< filters.size(); i++) {
-			selectedFilters.add(filters.get(i).getText().trim());
+			selectedFilters.add(filters.get(i).getText().toUpperCase().trim());
 			filters.get(i).click();
 			
 			verifyCardsAfterFilterApplied(selectedFilters, cardTagsMap);
 		}
 		
 		for(int i=0; i< filters.size(); i++) {
-			driver.findElement(By.xpath("//div[@id='"+filters.get(i).getAttribute("id")+"']/div[text()='close']")).click();
-			selectedFilters.remove(filters.get(i).getText().trim());
+//			driver.findElement(By.xpath("//div[@id='"+filters.get(i).getAttribute("id")+"']/div[text()='close']")).click();
+			filters.get(i).click();
+			selectedFilters.remove(filters.get(i).getText().trim().toUpperCase());
 
 			verifyCardsAfterFilterApplied(selectedFilters, cardTagsMap);
 		}
@@ -338,7 +344,7 @@ public class PEPList extends BaseComponent {
 			Verify.verifyEquals("Expected & Actual Filters options are matching", true);
 	}
 
-	private void verifyCTAButtonsFunctionality(WebElement cardElement, String layoutType, String buildList, Map<String, String> overrideCardData, boolean isFeatured) {
+	private void verifyCTAButtonsFunctionality(WebElement cardElement, String layoutType, String buildList, Map<String, String> overrideCardData, Map<String, String> expectedCardDetails, boolean isFeatured) {
 		WebDriver driver = DM.getCurrentWebDriver();
 		String title = "";
 		
@@ -346,8 +352,8 @@ public class PEPList extends BaseComponent {
 			title = cardElement.findElement(By.className("card__title")).getText();
 			WebElement link = cardElement.findElement(By.tagName("a"));
 			Verify.verifyEquals("Play button should display", link.findElements(By.className("fa-play-circle")).size()==1);
-			link.click();
-			verifyWindowTitle("Screen Title", title, driver.getTitle());
+			DM.clickJS(link);
+			verifyWindowTitle("Screen Title", expectedCardDetails.get("browserTitle"), driver.getTitle());
 			driver.navigate().back();
 		}else if("Child pages".equalsIgnoreCase(buildList)) {
 			if("Featured Card".equalsIgnoreCase(layoutType) && !isFeatured)
@@ -355,7 +361,7 @@ public class PEPList extends BaseComponent {
 			else
 				title = cardElement.findElement(By.className("card__title")).getText();
 			cardElement.findElement(By.linkText("View More")).click();
-			verifyWindowTitle("Button Link Title", title, driver.getTitle());
+			verifyWindowTitle("Button Link Title", expectedCardDetails.get("browserTitle"), driver.getTitle());
 			driver.navigate().back();
 		}else {
 			if(layoutType.contains("Webinar"))
@@ -366,7 +372,7 @@ public class PEPList extends BaseComponent {
 	}
 
 	private void verifyPresenceOfBrandBar(WebElement card, String brandBar) {
-		List<WebElement> brandBarElements = card.findElements(By.xpath("parent::div/div[contains(@class,'brand-lines')]"));
+		List<WebElement> brandBarElements = card.findElements(By.xpath("div[contains(@class,'brand-lines')]"));
 		if("check".equalsIgnoreCase(brandBar)) {
 			if(brandBarElements.size()==0)
 				Verify.verifyEquals("Brandbar should display", false);
@@ -380,7 +386,7 @@ public class PEPList extends BaseComponent {
 		}
 	}
 
-	private void verifyCardProperties(WebElement card, String layoutType, String buildList, Map<String, String> overrideCardData,
+	private Map<String, String> verifyCardProperties(WebElement card, String layoutType, String buildList, Map<String, String> overrideCardData,
 			Map<String, Map<String, String>> propertiesData, int cardIndex, boolean isFeaturedCard) throws ParseException {
 		
 		Boolean hideImage = false;
@@ -415,27 +421,28 @@ public class PEPList extends BaseComponent {
 		
 		String cardXpathText = null;
 		if(isFeaturedCard)
-			cardXpathText = "//div[contains(@class,'cards-container')]/div[@class='col right']/div[1]";
+			cardXpathText = "//div[contains(@class,'cards-container')]//div[@class='mdc-card card-component size-large']";
 		else
 			cardXpathText = "(//div[contains(@class,'cards-container')]//div[@class='mdc-card card-component'])["+(cardIndex+1)+"]";
 		
-		WidgetInfo image = new WidgetInfo("xpath="+cardXpathText+"//img", GUIWidget.class);
+		WidgetInfo image = new WidgetInfo("xpath="+cardXpathText+"//div[contains(@class,'mdc-card-media')]", GUIWidget.class);
 		WidgetInfo pageTitle = new WidgetInfo("xpath="+cardXpathText+"//div[@class='card__title']", GUIWidget.class);
 		WidgetInfo description = new WidgetInfo("xpath="+cardXpathText+"//div[@class='card__supporting-text']", GUIWidget.class);
 		WidgetInfo tags = new WidgetInfo("xpath="+cardXpathText+"//div[starts-with(@class,'tag')]", GUIWidget.class);
 		WidgetInfo overlayText = new WidgetInfo("xpath="+cardXpathText+"//div[@class='category-label']", GUIWidget.class);
 		WidgetInfo eventDate = new WidgetInfo("xpath="+cardXpathText+"//div[@class='date']", GUIWidget.class);
 		WidgetInfo eventPresenterName = new WidgetInfo("xpath="+cardXpathText+"//div[@class='author']", GUIWidget.class);
-		WidgetInfo eventPresenterNameArchive = new WidgetInfo("xpath="+cardXpathText+"//div[@class='auther']", GUIWidget.class);
+		WidgetInfo eventPresenterNameArchive = new WidgetInfo("xpath="+cardXpathText+"//div[@class='author']", GUIWidget.class);
 		WidgetInfo eventPresenterHeadshot = new WidgetInfo("xpath="+cardXpathText+"//img", GUIWidget.class);
 		WidgetInfo eventPresenterTitle = new WidgetInfo("xpath="+cardXpathText+"//figcaption", GUIWidget.class);
 		
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat dfactual = new SimpleDateFormat("dd MMM yyyy");
-		
+		Map<String, String> cardProperties = new HashMap<String, String>();
 		switch (layoutType) {
 			case "Grid Text":
 				actualCardDetails.put("pageTitle", DM.GUIWidget(pageTitle).getDisplayValue());
+				cardProperties = getCardProperties(propertiesData, "pageTitle", actualCardDetails.get("pageTitle"));
 				if(hideImage)
 					Verify.verifyEquals("Image should not visible", !DM.widgetVisible(image, 1, .5));
 				else
@@ -452,10 +459,11 @@ public class PEPList extends BaseComponent {
 	
 			case "Grid text with image":
 				actualCardDetails.put("pageTitle", DM.GUIWidget(pageTitle).getDisplayValue());
+				cardProperties = getCardProperties(propertiesData, "pageTitle", actualCardDetails.get("pageTitle"));
 				if(hideImage)
 					Verify.verifyEquals("Image should not visible", !DM.widgetVisible(image, 1, .5));
 				else
-					actualCardDetails.put("image", DM.GUIWidget(image).getAttribute("src"));
+					actualCardDetails.put("image", DM.GUIWidget(image).getAttribute("style"));
 				if(hideDescription)
 					Verify.verifyEquals("Description should not visible", !DM.widgetVisible(description, 1, .5));
 				else
@@ -468,9 +476,13 @@ public class PEPList extends BaseComponent {
 				
 			case "Webinar Card 1 Column":
 				actualCardDetails.put("headline", DM.GUIWidget(pageTitle).getDisplayValue());
-				actualCardDetails.put("eventDate", df.format(dfactual.parse(DM.GUIWidget(eventDate).getDisplayValue().substring(6))));
-				actualCardDetails.put("eventPresenterName", DM.GUIWidget(eventPresenterName).getDisplayValue().substring(11));
-				actualCardDetails.put("eventPresenterTitle", DM.GUIWidget(eventPresenterTitle).getDisplayValue());
+				cardProperties = getCardProperties(propertiesData, "headline", actualCardDetails.get("headline"));
+				if(isContentExist(cardProperties, "eventDate"))
+					actualCardDetails.put("eventDate", df.format(dfactual.parse(DM.GUIWidget(eventDate).getDisplayValue().substring(6))));
+				if(isContentExist(cardProperties, "eventPresenterName"))
+					actualCardDetails.put("eventPresenterName", DM.GUIWidget(eventPresenterName).getDisplayValue().substring(11));
+				if(isContentExist(cardProperties, "eventPresenterTitle"))
+					actualCardDetails.put("eventPresenterTitle", DM.GUIWidget(eventPresenterTitle).getDisplayValue());
 				actualCardDetails.put("eventPresenterHeadshot", DM.GUIWidget(eventPresenterHeadshot).getAttribute("src"));
 				if(hideDescription)
 					Verify.verifyEquals("Description should not visible", !DM.widgetVisible(description, 1, .5));
@@ -490,17 +502,22 @@ public class PEPList extends BaseComponent {
 				
 			case "Webinar Archive":
 				actualCardDetails.put("headline", DM.GUIWidget(pageTitle).getDisplayValue());
-				actualCardDetails.put("eventDate", df.format(dfactual.parse(DM.GUIWidget(eventDate).getDisplayValue().substring(6))));
-				actualCardDetails.put("eventPresenterName", DM.GUIWidget(eventPresenterNameArchive).getDisplayValue().substring(11));
+				cardProperties = getCardProperties(propertiesData, "headline", actualCardDetails.get("headline"));
+				if(isContentExist(cardProperties, "eventDate"))
+					actualCardDetails.put("eventDate", df.format(dfactual.parse(DM.GUIWidget(eventDate).getDisplayValue().substring(6))));
+				if(isContentExist(cardProperties, "eventPresenterName"))
+					actualCardDetails.put("eventPresenterName", DM.GUIWidget(eventPresenterNameArchive).getDisplayValue().substring(11));
 				break;
 			
 			case "Video Playlist":
-				actualCardDetails.put("image", DM.GUIWidget(image).getAttribute("src"));
+				actualCardDetails.put("image", DM.GUIWidget(new WidgetInfo("xpath="+cardXpathText+"//div[@class='event-card']", GUIWidget.class)).getAttribute("style"));
 				actualCardDetails.put("pageTitle", DM.GUIWidget(pageTitle).getDisplayValue());
+				cardProperties = getCardProperties(propertiesData, "pageTitle", actualCardDetails.get("pageTitle"));
 				if(hideDescription)
 					Verify.verifyEquals("Description should not visible", !DM.widgetVisible(description, 1, .5));
 				else
-					actualCardDetails.put("description", DM.GUIWidget(description).getDisplayValue());
+					if(isContentExist(cardProperties, "description"))
+						actualCardDetails.put("description", DM.GUIWidget(description).getDisplayValue());
 				break;
 				
 			default:
@@ -509,10 +526,15 @@ public class PEPList extends BaseComponent {
 					actualCardDetails.put("featuredFlag", "true");
 				}else
 					actualCardDetails.put("featuredFlag", "false");
-				if(hideImage)
-					Verify.verifyEquals("Image should not visible", !DM.widgetVisible(image, 1, .5));
+				WidgetInfo image_final;
+				if(isFeaturedCard)
+					image_final = new WidgetInfo("xpath="+cardXpathText+"//div[@class='mdc-media-large']", GUIWidget.class);
 				else
-					actualCardDetails.put("image", DM.GUIWidget(image).getAttribute("src"));
+					image_final = new WidgetInfo("xpath="+cardXpathText+"//div[@class='mdc-card-small-media']", GUIWidget.class);
+				if(hideImage)
+					Verify.verifyEquals("Image should not visible", !DM.widgetVisible(image_final, 1, .5));
+				else
+					actualCardDetails.put("image", DM.GUIWidget(image_final).getAttribute("style"));
 				if(hideDescription)
 					Verify.verifyEquals("Description should not visible", !DM.widgetVisible(description, 1, .5));
 				else if(isFeaturedCard)
@@ -523,18 +545,17 @@ public class PEPList extends BaseComponent {
 					Verify.verifyEquals("Tags should not visible", !DM.widgetVisible(overlayText, 1, .5));
 				else
 					actualCardDetails.put("tags", DM.GUIWidget(overlayText).getDisplayValue().replaceAll("\n", ","));
+				cardProperties = getCardProperties(propertiesData, "pageTitle", actualCardDetails.get("pageTitle"));
 				break;
 		}
-		
-		Map<String, String> cardProperties = getCardProperties(propertiesData, actualCardDetails, layoutType);
 		
 		for(String attribute : actualCardDetails.keySet()){
 			switch (attribute) {
 			case "image":
 				if(hideImage & !"".equals(overrideImage))
-					verifyImage("Verifying Card Content for "+attribute, overrideImage, actualCardDetails.get(attribute));
+					verifyImage("Verifying Card Content for "+attribute, overrideImage, actualCardDetails.get(attribute), false);
 				else
-					verifyImage("Verifying Card Content for "+attribute, cardProperties.get(attribute), actualCardDetails.get(attribute));
+					verifyImage("Verifying Card Content for "+attribute, cardProperties.get(attribute), actualCardDetails.get(attribute), false);
 				break;
 			case "description":
 				if(hideDescription & !"".equals(overrideDescription))
@@ -549,7 +570,7 @@ public class PEPList extends BaseComponent {
 					Verify.verifyEquals("Verifying Card Content for "+attribute, cardProperties.get(attribute).toUpperCase(), actualCardDetails.get(attribute));
 				break;
 			case "eventPresenterHeadshot":
-				verifyImage("Verifying Card Content for "+attribute, cardProperties.get(attribute), actualCardDetails.get(attribute));
+				verifyImage("Verifying Card Content for "+attribute, cardProperties.get(attribute), actualCardDetails.get(attribute), true);
 				break;
 			default:
 				Verify.verifyEquals("Verifying Card Content for "+attribute, cardProperties.get(attribute), actualCardDetails.get(attribute));
@@ -557,23 +578,28 @@ public class PEPList extends BaseComponent {
 			}
 		}
 		
+		return cardProperties;
 	}
 
-	private Map<String, String> getCardProperties(Map<String, Map<String, String>> propertiesData, Map<String, String> actualCardDetails, String layoutType) {
+	private boolean isContentExist(Map<String, String> cardProperties, String key) {
+		boolean exists = false;
+		if(cardProperties.containsKey(key) && !"".equals(cardProperties.get(key)))
+			exists = true;
+		return exists;
+	}
+
+	private Map<String, String> getCardProperties(Map<String, Map<String, String>> propertiesData, String keyName, String keyValue) {
 		Map<String, String> cardProperties = new HashMap<String, String>();
-		String keyName = "pageTitle";
-		if(layoutType.contains("Webinar"))
-			keyName = "headline";
 			
 		for(String title : propertiesData.keySet()) {
 			cardProperties = propertiesData.get(title);
-			if(cardProperties.get(keyName).equalsIgnoreCase(actualCardDetails.get(keyName)))
+			if(cardProperties.get(keyName).equalsIgnoreCase(keyValue))
 				break;
 		}
 		return cardProperties;
 	}
 
-	private Map<String, Map<String, String>> getPageProperties(String page, String layoutType) {
+	private Map<String, Map<String, String>> getPageProperties(Map<String, String> singlePageData, String page, String layoutType) {
 		String[] path = page.split("/");
 		navigateToPage(path);
 		List<WebElement> elements = DM.getCurrentWebDriver().findElements(By.xpath("//coral-columnview-item-content/div[contains(text(),'"+path[path.length-1]+"')]"));
@@ -581,6 +607,17 @@ public class PEPList extends BaseComponent {
 		Map<String, Map<String, String>> propertiesData = new HashMap<String, Map<String,String>>();
 		
 		propertiesData.putAll(readProperties(layoutType));
+		if(layoutType.contains("Webinar")) {
+			List<String> overrideFields = Arrays.asList("headline", "eventDate", "eventPresenterName", "eventPresenterTitle", "eventPresenterHeadshot");
+			for(String pageTitle : propertiesData.keySet()) {
+				Map<String, String> data = propertiesData.get(pageTitle); 
+				for(String key : data.keySet()) {
+					if(overrideFields.contains(key) && singlePageData.containsKey(key))
+						data.put(key, singlePageData.get(key));
+				}
+				propertiesData.put(pageTitle, data);
+			}
+		}
 		
 		return propertiesData;
 	}
@@ -607,6 +644,7 @@ public class PEPList extends BaseComponent {
 		Map<String, String> propertiesMap = new HashMap<String, String>();
 		WidgetInfo title = new WidgetInfo("name=./jcr:title", TextField.class);
 		WidgetInfo pageTitle = new WidgetInfo("name=./pageTitle", TextField.class);
+		WidgetInfo browserTitle = new WidgetInfo("name=./browserTitle", TextField.class);
 		
 		WidgetInfo pepPropertiesLink = new WidgetInfo("xpath=//coral-tab/coral-tab-label[text()='PEP Properties']", Link.class);
 		WidgetInfo pepImage = new WidgetInfo("name=./imagePath", TextField.class);
@@ -624,28 +662,35 @@ public class PEPList extends BaseComponent {
 		
 		
 		String titleText = DM.textField(title).getDisplayValue();
-		propertiesMap.put("pageTitle", DM.textField(pageTitle).getDisplayValue());
+		String pageTitleContent = DM.textField(pageTitle).getDisplayValue();
+		String browserTitleContent = DM.textField(browserTitle).getDisplayValue();
+		propertiesMap.put("pageTitle", pageTitleContent);
+		propertiesMap.put("browserTitle", browserTitleContent.equals("")?pageTitleContent:browserTitleContent);
 		DM.link(pepPropertiesLink).click();
 		propertiesMap.put("description", DM.GUIWidget(description).getDisplayValue().trim());
 		propertiesMap.put("mediaType", DM.dropDown(mediaType).getDisplayValue());
 		//Read Tags
 		List<WebElement> tagElements = DMHelper.getWebElement(tags).findElements(By.tagName("coral-tag-label"));
-		String tagsList = "";
-		for(WebElement tag : tagElements) {
-			String tagName = tag.getText();
-			if(tagName.contains("/"))
-				tagsList += ","+tagName.split("/")[1].trim();
-			else
-				tagsList += ","+tagName.split(":")[1].trim();
-		}
 		
-		propertiesMap.put("tags", tagsList.length()>1?tagsList.substring(1):"");
-		if("Featured Card".equalsIgnoreCase(layoutType))
-			propertiesMap.put("tags", tagsList.substring(1).split(",")[0].toUpperCase());
+		if("Featured Card".equalsIgnoreCase(layoutType)) {
+			String tagName = tagElements.get(0).getText().trim().toUpperCase();
+			propertiesMap.put("tags", tagName.contains("/")?tagName.split("/")[1].trim():tagName.split(":")[1].trim());
+		}else {
+			Set<String> tagValues = new TreeSet<String>();
+			for(WebElement tag : tagElements) {
+				String tagName = tag.getText();
+				if(tagName.contains("/"))
+					tagValues.add(tagName.split("/")[1].trim().toUpperCase());
+				else
+					tagValues.add(tagName.split(":")[1].trim().toUpperCase());
+			}
+			propertiesMap.put("tags", tagValues.size()>0?String.join(",", tagValues):"");
+		}
 		
 		if(layoutType.contains("Webinar")) {
 			DM.link(webinarPropertiesLink).click();
-			propertiesMap.put("headline", DM.textField(headline).getDisplayValue());
+			String headlineText = DM.textField(headline).getDisplayValue();
+			propertiesMap.put("headline", headlineText.equals("")?pageTitleContent:headlineText);
 			propertiesMap.put("eventDate", DM.textField(eventDate).getDisplayValue());
 			propertiesMap.put("eventPresenterName", DM.textField(eventPresenterName).getDisplayValue());
 			propertiesMap.put("eventPresenterTitle", DM.textField(eventPresenterTitle).getDisplayValue());
@@ -662,18 +707,17 @@ public class PEPList extends BaseComponent {
 		return propertiesData;
 	}
 	
-	private void navigateToPage(String[] path) {
-		DriverManagerHelper.sleep(1);
-		for(int i=2; i<path.length; i++) {
-			List<WebElement> elements = DM.getCurrentWebDriver().findElements(By.xpath("//div[contains(text(),'"+path[i]+"')]"));
-			elements.get(elements.size()-1).click();
-			DriverManagerHelper.sleep(1);
-		}
-	}
-
 	@Override
 	public String getComponentName() {
 		return componentName;
 	}
-
+public static void main(String[] args) {
+	String[] text = "ATLAS,HNSCC,HEAD AND NECK SQUAMOUS CELL CARCINOMA,PD-L1,STAINS".split(",");
+	Set<String> set = new TreeSet<String>();
+	for(String value : text)
+		set.add(value);
+	System.out.println(set);
+	System.out.println(String.join(",", set));
+	
+}
 }

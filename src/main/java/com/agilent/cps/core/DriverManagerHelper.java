@@ -17,7 +17,7 @@ import com.agilent.cps.widgets.WidgetInfo;
 public class DriverManagerHelper {
 	
 	public static final DriverManagerHelper adfManagerHelper= new DriverManagerHelper();
-	DriverManager adfManager = DriverManager.getInstance();
+	DriverManager driverManager = DriverManager.getInstance();
 	Logger logger = Logger.getInstance(); 
 	
 	public static DriverManagerHelper getInstance()
@@ -28,6 +28,7 @@ public class DriverManagerHelper {
 	public WebElement getWebElement(WidgetInfo widgetInfo)
 	{
 		By byLocator = getByLocator(widgetInfo);
+		driverManager.waitForWidget(byLocator, 5, .2);
 		return getWebDriver().findElement(byLocator);
 	}
 	
@@ -39,7 +40,7 @@ public class DriverManagerHelper {
 	
 	public WebDriver getWebDriver()
 	{
-		return adfManager.getCurrentWebDriver();
+		return driverManager.getCurrentWebDriver();
 	}
 	
 	public void switchWindow(String winTitle)
@@ -170,7 +171,7 @@ public class DriverManagerHelper {
 	 * Quit WebDriver
 	 */
 	public void tearDown() {
-		WebDriver driver = adfManager.getCurrentWebDriver();               
+		WebDriver driver = driverManager.getCurrentWebDriver();               
 		if (null != driver)
 			driver.quit();
 		sleep(2);

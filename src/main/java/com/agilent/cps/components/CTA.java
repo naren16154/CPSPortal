@@ -50,7 +50,7 @@ public class CTA extends BaseComponent {
 		}else {
 			verifyColor("Verifying button text color", "White", element.getCssValue("color"));
 			verifyColor("Verifying button BG color", "Blue", element.getCssValue("background-color"));
-			Verify.verifyEquals("Verifying button does not has border", element.getCssValue("border").contains("0px none"));
+			Verify.verifyEquals("Verifying button does not has border", element.getCssValue("border").contains("1px solid"));
 		}
 		verifyButtonStyle(element, rowData);
 		verifyLinkOrbutton(element, rowData.getOrDefault("linkActions", "Existing window/tab"), rowData.get("buttonLink"), "AutomationTestingPage");
@@ -58,23 +58,23 @@ public class CTA extends BaseComponent {
 	
 	private void verifyButtonStyle(WebElement element, Map<String, String> rowData) {
 		String buttonTextSize = "15px";
-		String bottomPadding = "16px";
-		String topPadding = "16px";
+		String bottomPadding = "15px";
+		String topPadding = "15px";
 		String leftPadding = "30px";
 		String rightPadding = "30px";
 		String buttonColor = rowData.getOrDefault("buttonColor", "Blue/Solid");
 		if(buttonColor.equalsIgnoreCase("Text")) {
 			buttonTextSize = "18px";
 			bottomPadding = "15px";
-			topPadding = "14px";
+			topPadding = "15px";
 			leftPadding = "10px";
 			rightPadding = "10px";
 		}
 		if(rowData.containsKey("selectStyle")) {
 			if("Small".equalsIgnoreCase(rowData.get("selectStyle"))) {
 				buttonTextSize = "11px";
-				bottomPadding = "8px";
-				topPadding = "9px";
+				bottomPadding = "7px";
+				topPadding = "6px";
 				leftPadding = "15px";
 				rightPadding = "15px";
 				if(buttonColor.equalsIgnoreCase("Text")) {

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -35,6 +36,7 @@ public class AuthorTests extends BaseAuthorTest{
 	
 	@Test(groups= {"author"}, dataProvider = "getAuthorTestNames", dependsOnMethods = {"createPageForAuthorTests"})
 	public void runAuthorTests(String component, String testName, int rowCount) throws Exception {
+		WebDriver driver = DM.getCurrentWebDriver();
 		Map<String, String> rowData = dataMap.get(component).get(rowCount);
 		rowData.remove("TestName");
 		componentObject=screenMap.get(component);
@@ -42,25 +44,21 @@ public class AuthorTests extends BaseAuthorTest{
 		{
 			String componentName = componentObject.getComponentName();
 			DriverManagerHelper.sleep(1);
-			DM.getCurrentWebDriver().findElement(By.xpath("//div[@data-text='Drag components here']")).click();
-			DM.getCurrentWebDriver().findElements(By.xpath("//button[@icon='add']/coral-icon")).get(1).click();
+			WidgetInfo dragComponentLink = new WidgetInfo("xpath=//div[@data-text='Drag components here']", GUIWidget.class);
+			DM.clickJS(DMHelper.getWebElement(dragComponentLink));
+			DM.clickJS(driver.findElements(By.xpath("//button[@icon='add']/coral-icon")).get(1));
 			
 			DM.textField(new WidgetInfo("xpath=//coral-search//input", TextField.class)).setDisplayValue(componentName);
 			DriverManagerHelper.sleep(2);
-			DM.getCurrentWebDriver().findElement(By.xpath("//coral-selectlist-group[@label='next-gen-acom-components.Content']//coral-selectlist-item[text()='"+componentName+"']")).click();
+			driver.findElement(By.xpath("//coral-selectlist-group[@label='next-gen-acom-components.Content']//coral-selectlist-item[text()='"+componentName+"']")).click();
 			DriverManagerHelper.sleep(2);
-			WebElement componentElement = DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='"+componentName+"']"));
-			if(componentName.equalsIgnoreCase("Carousel")) {
-				componentElement.click();
-				DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Parent']/coral-icon")).click();
-				DM.getCurrentWebDriver().findElement(By.xpath("//coral-list-item-content[text()='Carousel']")).click();
-			}else
-				componentElement.click();
-			DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Configure']")).click();
+			WebElement componentElement = driver.findElement(By.xpath("//div[@title='"+componentName+"']"));
+			DM.clickJS(componentElement);
+			driver.findElement(By.xpath("//button[@title='Configure']")).click();
 			DriverManagerHelper.sleep(2);
 			componentObject.populate(rowData);
 			if(DM.widgetEnabled(new WidgetInfo("xpath=//button[@title='Done']", Button.class), 1, .5)) {
-				DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Done']")).click();
+				driver.findElement(By.xpath("//button[@title='Done']")).click();
 				DriverManagerHelper.sleep(2);
 			}
 //			DM.getCurrentWebDriver().findElement(By.xpath("//button/coral-button-label[text()='Preview']")).click();
@@ -71,14 +69,15 @@ public class AuthorTests extends BaseAuthorTest{
 //			DM.getCurrentWebDriver().switchTo().defaultContent();
 //			DM.getCurrentWebDriver().findElement(By.xpath("//button[text()='Edit']")).click();
 			
-			String authoringWindow = DM.getCurrentWebDriver().getTitle();
-			DM.getCurrentWebDriver().findElement(By.id("pageinfo-trigger")).click();
+			String authoringWindow = driver.getTitle();
+			driver.findElement(By.id("pageinfo-trigger")).click();
 			DriverManagerHelper.sleep(2);
-			DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='View as Published']")).click();
+			driver.findElement(By.xpath("//button[@title='View as Published']")).click();
 			
-			for(String window : DM.getCurrentWebDriver().getWindowHandles())
-				DM.getCurrentWebDriver().switchTo().window(window);
-			DriverManagerHelper.sleep(2);
+			for(String window : driver.getWindowHandles())
+				driver.switchTo().window(window);
+			DriverManagerHelper.sleep(5);
+			
 			componentObject.verifyPreview(rowData);
 			WidgetInfo stickyNav = new WidgetInfo("xpath=//section[@class='secondary-nav sticky-top']", GUIWidget.class);
 			if(DM.widgetVisible(stickyNav, 2, .5)) {
@@ -87,21 +86,16 @@ public class AuthorTests extends BaseAuthorTest{
 			}
 			ScreenShotUtility.getInstance().takeScreenshot();
 			
-			DM.getCurrentWebDriver().close();
+			driver.close();
 			
 			DriverManagerHelper.getInstance().switchWindow(authoringWindow);
 			
 			DriverManagerHelper.sleep(2);
-			componentElement = DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='"+componentName+"']"));
-			if(componentName.equalsIgnoreCase("Carousel") || componentName.equalsIgnoreCase("Accordion")) {
-				componentElement.click();
-				DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Parent']/coral-icon")).click();
-				DM.getCurrentWebDriver().findElement(By.xpath("//coral-list-item-content[text()='"+componentName+"']")).click();
-			}else
-				componentElement.click();
-			DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Delete']")).click();
+			componentElement = driver.findElement(By.xpath("//div[@title='"+componentName+"']"));
+			DM.clickJS(componentElement);
+			driver.findElement(By.xpath("//button[@title='Delete']")).click();
 			
-			DM.getCurrentWebDriver().findElement(By.xpath("//button/coral-button-label[text()='Delete']")).click();
+			driver.findElement(By.xpath("//button/coral-button-label[text()='Delete']")).click();
 			Verify.softAssert.assertAll();
 			DriverManagerHelper.sleep(2);
 		}

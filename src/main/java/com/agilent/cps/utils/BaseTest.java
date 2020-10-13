@@ -28,6 +28,7 @@ import org.testng.annotations.BeforeSuite;
 
 import com.agilent.cps.components.BaseComponent;
 import com.agilent.cps.core.DriverManager;
+import com.agilent.cps.core.DriverManagerHelper;
 
 public class BaseTest{
 	
@@ -36,6 +37,7 @@ public class BaseTest{
 	
 	public Logger logger = Logger.getInstance();
 	public DriverManager DM = DriverManager.getInstance();
+	public DriverManagerHelper DMHelper = DriverManagerHelper.getInstance();
 	public static Date startTime;
 	public static Properties configProperties = new Properties();
 	public static String url;

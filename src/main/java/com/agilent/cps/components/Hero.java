@@ -42,7 +42,7 @@ public class Hero extends BaseComponent {
 		WidgetInfo heroText = new WidgetInfo("xpath="+carouselHeroText+"//div[@class='text-section__title']", Label.class);
 		WidgetInfo heroDescription = new WidgetInfo("xpath="+carouselHeroText+"//div[@class='text-section__description']", Label.class);
 		WidgetInfo brandBar = new WidgetInfo("xpath="+carouselHeroText+"//div[@class='brand-lines']", GUIWidget.class);
-		WidgetInfo imageSection = new WidgetInfo("xpath="+carouselHeroText+"//div[@class='image-section']/img", GUIWidget.class);
+		WidgetInfo imageSection = new WidgetInfo("xpath="+carouselHeroText+"//div[@class='image-section']/div[@class='hero-bg-banner']", GUIWidget.class);
 		verifyHeroStyle(rowData, brandBar, heroTextSection);
 		if(rowData.containsKey("heroHeadlineText"))
 			Verify.verifyEquals("Verifying Hero Text", rowData.get("heroHeadlineText"), DM.label(heroText).getDisplayValue());
@@ -54,17 +54,17 @@ public class Hero extends BaseComponent {
 				Verify.verifyEquals("Verifying Image should not display", !DM.widgetVisible(imageSection, 1, .5));
 			else {
 				Verify.verifyEquals("Verifying presence of Image", DM.widgetVisible(imageSection, 1, .5));
-				verifyImage("Verifying Image Path", rowData.get("backgroungImage"), DM.GUIWidget(imageSection).getAttribute("src"));
+				verifyImage("Verifying Image Path", rowData.get("backgroungImage"), DM.GUIWidget(imageSection).getAttribute("style"), false);
 			}
 		}else if(rowData.containsKey("backgroungImage")) {
 			Verify.verifyEquals("Verifying presence of Image", DM.widgetVisible(imageSection, 1, .5));
-			verifyImage("Verifying Image Path", rowData.get("backgroungImage"), DM.GUIWidget(imageSection).getAttribute("src"));
+			verifyImage("Verifying Image Path", rowData.get("backgroungImage"), DM.GUIWidget(imageSection).getAttribute("style"), false);
 		}
 		
 		if(rowData.containsKey("addButton")) {
 			WidgetInfo heroButton = new WidgetInfo("linktext="+rowData.get("buttonText"), Link.class);
 			Verify.verifyEquals("Verifying CTA Href", DM.GUIWidget(heroButton).getAttribute("href").contains(rowData.get("buttonLink")));
-			DM.GUIWidget(heroButton).click();
+			DM.clickJS(DMHelper.getWebElement(heroButton));
 			verifyWindowTitle("Verifying window title", "AutomationTestingPage", DM.getCurrentWebDriver().getTitle());
 			DMHelper.getWebDriver().navigate().back();
 		}

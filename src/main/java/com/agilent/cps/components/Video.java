@@ -47,13 +47,18 @@ public class Video extends BaseComponent{
 	}
 	
 	public void dropThumbnail(String data) {
-		DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Done']")).click();
-		DriverManagerHelper.sleep(1);
-		DM.button(new WidgetInfo("xpath=//button[@title='Toggle Side Panel']", Button.class)).click();
-		DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='"+componentName+"']")).click();;
-		DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Configure']")).click();
-		DM.dropDown(Widgets.assetType).setDisplayValue("Images");
-		DM.textField(Widgets.assetFilter_Image).setDisplayValue(data);
+		if(!DM.widgetVisible(Widgets.assetType, 1, .5)) {
+			DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Done']")).click();
+			DriverManagerHelper.sleep(1);
+			DM.button(new WidgetInfo("xpath=//button[@title='Toggle Side Panel']", Button.class)).click();
+			DM.dropDown(Widgets.assetType).setDisplayValue("Images");
+			DM.textField(Widgets.assetFilter_Image).setDisplayValue(data);
+			DM.getCurrentWebDriver().findElement(By.xpath("//div[@title='"+componentName+"']")).click();
+			DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Configure']")).click();
+		}else {
+			DM.dropDown(Widgets.assetType).setDisplayValue("Images");
+			DM.textField(Widgets.assetFilter_Image).setDisplayValue(data);
+		}
 		Actions actions = new Actions(DM.getCurrentWebDriver());
 		actions.dragAndDrop(DMHelper.getWebElement(Widgets.videoDrag), DMHelper.getWebElements(Widgets.dropTarget).get(1)).perform();
 	}

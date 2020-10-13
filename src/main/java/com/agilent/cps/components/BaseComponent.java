@@ -19,6 +19,9 @@ import com.agilent.cps.core.Verify;
 import com.agilent.cps.utils.BaseTest;
 import com.agilent.cps.utils.Logger;
 import com.agilent.cps.utils.ReadExcel;
+import com.agilent.cps.widgetactions.Link;
+import com.agilent.cps.widgetactions.TextField;
+import com.agilent.cps.widgets.WidgetInfo;
 
 enum ColorCode{
 	black("#000000"),
@@ -101,14 +104,14 @@ public abstract class BaseComponent {
 			Verify.verifyEquals("Verifying new tab/window opened", isWindowCountMatched && isWindowTargetMatched);
 			for(String window : windows)
 				driver.switchTo().window(window);
-			verifyWindowTitle("Verifying window title", newWindowTitle, driver.getTitle());
+			verifyWindowTitle("Verifying window title", newWindowTitle.equals("")?getExpectedTitle(linkUrl):newWindowTitle, driver.getTitle());
 			driver.close();
 			driver.switchTo().window(windowBefore);
 		}else {
 			isWindowCountMatched = windowsCountBefore==windows.size();
 			isWindowTargetMatched = "_self".equals(target) || "".equals(target);
 			Verify.verifyEquals("Verifying link opened in same tab", isWindowCountMatched && isWindowTargetMatched);
-			verifyWindowTitle("Verifying window title", newWindowTitle, driver.getTitle());
+			verifyWindowTitle("Verifying window title", newWindowTitle.equals("")?getExpectedTitle(linkUrl):newWindowTitle, driver.getTitle());
 			driver.navigate().back();
 		}
 	}
@@ -118,14 +121,62 @@ public abstract class BaseComponent {
 		Verify.verifyEquals(message, expectedColorCode, Color.fromString(expectedColorCode).asHex());
 	}
 	
-	public void verifyImage(String message, String expectedImageSrc, String actualImageSrc) {
-		expectedImageSrc = BaseTest.url.charAt(BaseTest.url.length()-1)=='/'?BaseTest.url.substring(0,BaseTest.url.length()-1)+expectedImageSrc:BaseTest.url+expectedImageSrc;
-		Verify.verifyEquals(message, expectedImageSrc, actualImageSrc.replaceAll("%20", " "));
+	public void verifyImage(String message, String expectedImageSrc, String actualImageSrc, boolean isImgTag) {
+		if(isImgTag) {
+			expectedImageSrc = BaseTest.url.charAt(BaseTest.url.length()-1)=='/'?BaseTest.url.substring(0,BaseTest.url.length()-1)+expectedImageSrc:BaseTest.url+expectedImageSrc;
+			Verify.verifyEquals(message, expectedImageSrc, actualImageSrc.replaceAll("%20", " "));
+		}else {
+			actualImageSrc = actualImageSrc.replaceAll(".*\\(\"", "").replaceAll("\"\\).*", "");
+			Verify.verifyEquals(message, expectedImageSrc, actualImageSrc);
+		}
 	}
 	
 	public void verifyWindowTitle(String message, String expectedTitle, String actualTitle) {
-		expectedTitle = actualTitle.endsWith(" | Agilent")?(expectedTitle.length()>54?expectedTitle.substring(0,54):expectedTitle)+" | Agilent":expectedTitle;
+		expectedTitle = actualTitle.endsWith(" | Agilent")?(expectedTitle.length()>55?expectedTitle.substring(0,55).trim():expectedTitle)+" | Agilent":expectedTitle;
 		Verify.verifyEquals(message, expectedTitle, actualTitle);
+	}
+	
+	public String getExpectedTitle(String page) {
+		WebDriver driver = DM.getCurrentWebDriver();
+		String title = "";
+		if(page.contains("http")) {
+			for(Map<String, String> rowData : ReadExcel.workbookData.get("WindowTitles")) {
+				if(rowData.containsValue(page)) {
+					title = rowData.get("Title");
+					break;
+				}
+			}
+		}else {
+			String[] path = page.split("/");
+			navigateToPage(path);
+			List<WebElement> elements = driver.findElements(By.xpath("//coral-columnview-item-content/div[contains(text(),'"+path[path.length-1]+"')]"));
+			elements.get(0).findElement(By.xpath("../..//img")).click();
+			driver.findElement(By.xpath("//button/coral-button-label[contains(text(), 'Properties')]")).click();
+			
+			WidgetInfo pageTitle = new WidgetInfo("name=./pageTitle", TextField.class);
+			WidgetInfo browserTitle = new WidgetInfo("name=./browserTitle", TextField.class);
+			
+			String pageTitleContent = DM.textField(pageTitle).getDisplayValue();
+			String browserTitleContent = DM.textField(browserTitle).getDisplayValue();
+			title = browserTitleContent.equals("")?pageTitleContent:browserTitleContent;
+			
+			DM.link(new WidgetInfo("linktext=Cancel", Link.class)).click();
+			
+			Set<String> windows = driver.getWindowHandles();
+			for(String window : windows)
+				driver.switchTo().window(window);
+		}
+		
+		return title;
+	}
+	
+	public void navigateToPage(String[] path) {
+		DMHelper.switchWindow("AEM Sites");
+		for(int i=2; i<path.length; i++) {
+			List<WebElement> elements = DM.getCurrentWebDriver().findElements(By.xpath("//div[contains(text(),'"+path[i]+"')]"));
+			elements.get(elements.size()-1).click();
+			DriverManagerHelper.sleep(1);
+		}
 	}
 	
 	public void verifyTextFontSize(String string, WebElement element, String fontStyle) {

@@ -36,6 +36,7 @@ public class Carousel extends BaseComponent{
 			DM.textField(new WidgetInfo("xpath=//coral-search//input", TextField.class)).setDisplayValue("herocomponent");
 			DriverManagerHelper.sleep(2);
 			DM.GUIWidget(new WidgetInfo("xpath=//coral-selectlist-item[text()='herocomponent']", GUIWidget.class)).click();
+			DriverManagerHelper.sleep(2);
 		}
 		List<WebElement> inputs = DM.getCurrentWebDriver().findElements(By.xpath("//input[contains(@name,'cq:panelTitle')]"));
 		for(int i=0; i<inputs.size(); i++)
@@ -53,7 +54,7 @@ public class Carousel extends BaseComponent{
 		List<Map<String, String>> dataIterations = getDataMap(heroData);
 		List<WebElement> heroComponents = DM.getCurrentWebDriver().findElements(By.xpath("//div[@title='herocomponent']"));
 		for(int i=0; i<heroComponents.size(); i++) {
-			heroComponents.get(0).click();
+			DM.clickJS(heroComponents.get(0));
 			DriverManagerHelper.sleep(.5);
 			DM.getCurrentWebDriver().findElement(By.xpath("//button[@title='Configure']")).click();
 			DriverManagerHelper.sleep(2);
@@ -80,6 +81,7 @@ public class Carousel extends BaseComponent{
 		List<Map<String, String>> dataMap = getDataMap(rowData.get("authorHerocomponents"));
 		String[] heros = rowData.get("addHeroComponents").split("\n");
 		for(int i=0; i<heros.length; i++) {
+			DM.getJSExecutor().executeScript("window.scrollTo(0,0);");
 			DM.getCurrentWebDriver().findElement(By.xpath("//li[contains(text(), '"+heros[i]+"')]")).click();
 			DriverManagerHelper.sleep(2);
 			Map<String, String> verifyData = dataMap.get(i);
@@ -107,7 +109,6 @@ public class Carousel extends BaseComponent{
 			Actions actions = new Actions(DM.getCurrentWebDriver());
 			actions.moveToElement(elementList.get(0)).perform();
 			actions.moveToElement(DM.getCurrentWebDriver().findElement(By.linkText("AutomationTestingPage"))).perform();
-//			DM.getJSExecutor().executeScript("arguments[0].scrollIntoView(true);", elementList.get(0));
 			if("uncheck".equalsIgnoreCase(disableTransitionOnHover)) {
 				String carouselTabBefore = DM.GUIWidget(carousalActiveTab).getText();
 				DriverManagerHelper.sleep((Integer.parseInt(transitionDelay)/1000)+1);
@@ -126,13 +127,11 @@ public class Carousel extends BaseComponent{
 			}else {
 				actions.moveToElement(elementList.get(0)).perform();
 				
-				for(int i=0; i< elementList.size(); i++) {
-					String carouselTabBefore = DM.GUIWidget(carousalActiveTab).getText();
-					DriverManagerHelper.sleep((Integer.parseInt(transitionDelay)/1000)+1);
-					String carouselTabAfter = DM.GUIWidget(carousalActiveTab).getText();
-					
-					Verify.verifyEquals("Verifying Auto Transition Enabled Though We Hover iteration"+i, !carouselTabBefore.equalsIgnoreCase(carouselTabAfter));
-				}
+				String carouselTabBefore = DM.GUIWidget(carousalActiveTab).getText();
+				DriverManagerHelper.sleep((Integer.parseInt(transitionDelay)/1000)+1);
+				String carouselTabAfter = DM.GUIWidget(carousalActiveTab).getText();
+				
+				Verify.verifyEquals("Verifying Auto Transition Enabled Though We Hover", !carouselTabBefore.equalsIgnoreCase(carouselTabAfter));
 			}
 			
 		}else {

@@ -1,0 +1,39 @@
+pipeline {
+    agent { 
+		label{
+			label ''
+			customWorkspace ''
+		}
+	}
+	
+    stages {
+        stage('Build') {
+            steps {
+                bat '''
+					cd CPSPortalAutomation
+					rmdir allurereports
+					rmdir /s /q logs
+					mkdir allurereports
+					mvn clean install -Dbrowser=CHROME -Dgroups=author -Dheadless=true -Dtests= -Denv=dev -DisRCServer=false -Dport=4444
+				'''
+            }
+        }
+    }
+    post {
+        always {
+			
+			script {
+				bat'''
+					copy target\\surefire-reports\\TEST-TestSuite.xml allurereports
+				'''
+				archiveArtifacts artifacts: 'logs\\'
+				allure([
+				includeProperties: false,
+				jdk: '',
+				properties: [],
+				reportBuildPolicy: 'ALWAYS',
+				results: [[path: 'allurereports']]])
+			}	
+        }
+    }
+}

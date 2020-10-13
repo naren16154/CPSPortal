@@ -10,6 +10,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -55,8 +56,8 @@ public class Browser{
 		case "IE":
 			return getIEDriver();
 			
-		case "CHROME":
-			return getChromeDriver();
+		case "FIREFOX":
+			return getFFDriver();
 			
 		case "EDGE":
 			return getEdgeDriver();
@@ -65,7 +66,7 @@ public class Browser{
 			return getAndroidDriver();
 
 		default:
-			return getFFDriver();
+			return getChromeDriver();
 		}
 	}
 
@@ -74,20 +75,27 @@ public class Browser{
 		WebDriver driver = null;
 		if(null == System.getProperty("webdriver.gecko.driver"))
 			System.setProperty("webdriver.gecko.driver", Constants.firefoxDriver);
+		
+		FirefoxOptions options = new FirefoxOptions();
+		String headless = System.getProperty("headless", "false");
+		if(Boolean.parseBoolean(headless)) {
+			options.addArguments("--headless");
+			options.addArguments("--window-size=1920,1080");
+		}
+		options.addPreference("javascript.enabled", true);
+		
 		if(Boolean.parseBoolean(Constants.isrcserver))
 		{
-			DesiredCapabilities DC_FF = DesiredCapabilities.firefox();
-			DC_FF.setJavascriptEnabled(true);
 			String url = "http://localhost:"+Constants.port+"/wd/hub";
 			
 			try {
-				driver = new RemoteWebDriver(new URL(url), DC_FF);
+				driver = new RemoteWebDriver(new URL(url), options);
 			} catch (MalformedURLException e) {
 				e.printStackTrace();
 			}
 		}
 		else
-			driver = new FirefoxDriver();
+			driver = new FirefoxDriver(options);
 			
 		return driver;
 	}
@@ -161,8 +169,6 @@ public class Browser{
 			Logger.getInstance().info("Browser Headless mode enabled");
 			options.addArguments("--headless");
 			options.addArguments("--window-size=1920,1080");
-//	        options.addArguments("--disable-dev-shm-usage");
-//			options.addArguments("--disable-gpu");
 		}
 		if(Boolean.parseBoolean(Constants.isrcserver))
 		{

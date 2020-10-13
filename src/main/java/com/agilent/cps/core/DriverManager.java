@@ -187,6 +187,16 @@ public class DriverManager {
 		}
 	}
 	
+	public void clickJS(WebElement element)
+	{
+		getJSExecutor().executeScript("arguments[0].click();", element);
+	}
+	
+	public void click(WebElement element)
+	{
+		element.click();
+	}
+	
 	public Button button(WidgetInfo widgetInfo)
 	{
 		return new Button(widgetInfo);

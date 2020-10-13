@@ -30,7 +30,7 @@ public class Image extends BaseComponent{
 	public static class Widgets {
 		public static final WidgetInfo imageDrop = new WidgetInfo("name=./file", GUIWidget.class);
 		public static final WidgetInfo imagedrag = new WidgetInfo("xpath=//coral-card", GUIWidget.class);
-		public static final WidgetInfo altText = new WidgetInfo("name=./alt", TextField.class);
+//		public static final WidgetInfo altText = new WidgetInfo("name=./alt", TextField.class);
 		public static final WidgetInfo imageCaption = new WidgetInfo("xpath=//label[contains(text(),'Caption')]/../input[@name='./jcr:title']", TextField.class);
 		public static final WidgetInfo captionAsPopup = new WidgetInfo("name=./displayPopupTitle", CheckBox.class);
 	}
@@ -50,8 +50,8 @@ public class Image extends BaseComponent{
 	public void verifyPreview(Map<String, String> rowData) {
 		WidgetInfo img = new WidgetInfo("xpath=//img[@data-mode='smartcrop']", GUIWidget.class);
 		Verify.verifyEquals("Verifying presence of Image", DM.widgetVisible(img, 1, .5));
-		Verify.verifyEquals("Verifying Alt Text", rowData.get("altText"), DM.GUIWidget(img).getAttribute("alt"));
-		verifyImage("Verifying Image src", rowData.get("dropImage"), DM.GUIWidget(img).getAttribute("src"));
+//		Verify.verifyEquals("Verifying Alt Text", rowData.get("altText"), DM.GUIWidget(img).getAttribute("alt"));
+//		verifyImage("Verifying Image src", rowData.get("dropImage"), DM.GUIWidget(img).getAttribute("src"), true);
 		if(rowData.getOrDefault("captionAsPopup", "CHECK").equalsIgnoreCase("CHECK"))
 			Verify.verifyEquals("Verifying Image Caption", rowData.get("imageCaption"), DM.GUIWidget(new WidgetInfo("xpath=//meta[@itemprop='caption']", GUIWidget.class)).getAttribute("content"));
 		else
